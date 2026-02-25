@@ -1,6 +1,6 @@
 """Rate limiting service for API endpoints."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import Optional
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -58,7 +58,13 @@ class RateLimiter:
             return False
 
         # Check if window has expired
-        time_since_first = datetime.utcnow() - limit_entry.first_hit_at
+        # Convert naive datetime from DB to UTC-aware for comparison
+        first_hit_at = (
+            limit_entry.first_hit_at.replace(tzinfo=UTC)
+            if limit_entry.first_hit_at.tzinfo is None
+            else limit_entry.first_hit_at
+        )
+        time_since_first = datetime.now(UTC) - first_hit_at
         if time_since_first > timedelta(minutes=window_minutes):
             # Window expired, reset counter
             await self._reset_limit_entry(limit_entry)
@@ -103,7 +109,13 @@ class RateLimiter:
                 "reset_in_seconds": window_minutes * 60,
             }
 
-        time_since_first = datetime.utcnow() - limit_entry.first_hit_at
+        # Convert naive datetime from DB to UTC-aware for comparison
+        first_hit_at = (
+            limit_entry.first_hit_at.replace(tzinfo=UTC)
+            if limit_entry.first_hit_at.tzinfo is None
+            else limit_entry.first_hit_at
+        )
+        time_since_first = datetime.now(UTC) - first_hit_at
         time_remaining = timedelta(minutes=window_minutes) - time_since_first
 
         if time_remaining.total_seconds() <= 0:
@@ -127,7 +139,8 @@ class RateLimiter:
         Returns:
             Number of entries deleted
         """
-        cutoff_time = datetime.utcnow() - timedelta(days=days)
+        # Use naive datetime for DB comparison since DB stores naive datetimes
+        cutoff_time = datetime.now(UTC).replace(tzinfo=None) - timedelta(days=days)
         stmt = delete(RateLimitEntry).where(RateLimitEntry.last_hit_at < cutoff_time)
         result = await self.session.execute(stmt)
         await self.session.commit()
@@ -174,14 +187,14 @@ class RateLimiter:
     async def _increment_hit_count(self, entry: RateLimitEntry) -> None:
         """Increment hit count for an entry."""
         entry.hit_count += 1
-        entry.last_hit_at = datetime.utcnow()
+        entry.last_hit_at = datetime.now(UTC)
         self.session.add(entry)
         await self.session.commit()
 
     async def _reset_limit_entry(self, entry: RateLimitEntry) -> None:
         """Reset hit count for an entry."""
         entry.hit_count = 1
-        entry.first_hit_at = datetime.utcnow()
-        entry.last_hit_at = datetime.utcnow()
+        entry.first_hit_at = datetime.now(UTC)
+        entry.last_hit_at = datetime.now(UTC)
         self.session.add(entry)
         await self.session.commit()

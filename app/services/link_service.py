@@ -1,6 +1,6 @@
 """Link service for managing shortened links."""
 
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 
 from sqlalchemy import select
@@ -210,7 +210,7 @@ class LinkService:
             raise NotFoundError(f"Link with slug '{slug}' not found")
 
         link.hit_count += 1
-        link.last_hit_at = datetime.utcnow()
+        link.last_hit_at = datetime.now(UTC)
         self.db.add(link)
         await self.db.commit()
         await self.db.refresh(link)

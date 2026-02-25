@@ -3,7 +3,7 @@
 import json
 import uuid
 import time
-from datetime import datetime
+from datetime import datetime, UTC
 from quart import Request, Response, has_request_context, g
 from app.config import settings
 
@@ -27,7 +27,7 @@ async def setup_request_logging(app):
 
         # Log request (avoid logging sensitive data)
         log_data = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "request_id": request_id,
             "method": request.method,
             "path": request.path,
@@ -57,7 +57,7 @@ async def setup_request_logging(app):
 
         # Log response
         log_data = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "request_id": request_id,
             "method": request.method,
             "path": request.path,
@@ -80,7 +80,7 @@ async def setup_request_logging(app):
         request_id = getattr(g, "request_id", "unknown") if has_request_context() else "unknown"
 
         error_data = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "request_id": request_id,
             "error_type": error.__class__.__name__,
             "error_message": str(error),

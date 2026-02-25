@@ -1,6 +1,6 @@
 """Statistics service for dashboard functionality."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -55,7 +55,7 @@ class StatsService:
         Returns:
             Count of active users
         """
-        seven_days_ago = datetime.utcnow() - timedelta(days=7)
+        seven_days_ago = datetime.now(UTC) - timedelta(days=7)
         result = await self.session.execute(
             select(func.count(func.distinct(Link.user_id))).where(
                 Link.last_hit_at >= seven_days_ago

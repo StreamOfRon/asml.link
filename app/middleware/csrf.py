@@ -3,7 +3,7 @@
 import secrets
 import hmac
 import hashlib
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -57,7 +57,7 @@ class CSRFProtection:
         try:
             token_datetime = datetime.fromisoformat(token_time)
             expiration = timedelta(minutes=settings.csrf_token_expiration_minutes)
-            if datetime.utcnow() - token_datetime > expiration:
+            if datetime.now(UTC) - token_datetime > expiration:
                 return False
         except (ValueError, TypeError):
             return False
@@ -76,7 +76,7 @@ class CSRFProtection:
         if not token:
             token = CSRFProtection.generate_token()
             session[CSRFProtection.CSRF_TOKEN_SESSION_KEY] = token
-            session[CSRFProtection.CSRF_TOKEN_TIME_KEY] = datetime.utcnow().isoformat()
+            session[CSRFProtection.CSRF_TOKEN_TIME_KEY] = datetime.now(UTC).isoformat()
 
         return token
 
