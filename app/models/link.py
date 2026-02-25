@@ -47,23 +47,3 @@ class Link(BaseModel):
         import json
 
         self.allowed_emails = json.dumps(emails) if emails else None
-
-    def __repr__(self) -> str:
-        return f"<Link(slug={self.slug!r}, original_url={self.original_url!r}, is_public={self.is_public})>"
-
-    def get_allowed_emails(self) -> list[str]:
-        """Parse allowed emails from JSON string."""
-        if not self.allowed_emails:
-            return []
-        import json
-
-        try:
-            return json.loads(self.allowed_emails)
-        except (json.JSONDecodeError, TypeError):
-            return []
-
-    def set_allowed_emails(self, emails: list[str]) -> None:
-        """Set allowed emails as JSON string."""
-        import json
-
-        self.allowed_emails = json.dumps(emails) if emails else None

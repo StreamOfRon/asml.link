@@ -44,12 +44,10 @@ async def create_app() -> Quart:
         app.logger.error(f"Internal server error: {error}")
         return jsonify({"error": "Internal server error"}), 500
 
-    # Register blueprints (will be added in future phases)
-    # from app.routes import auth_bp, links_bp, users_bp, admin_bp
-    # app.register_blueprint(auth_bp)
-    # app.register_blueprint(links_bp)
-    # app.register_blueprint(users_bp)
-    # app.register_blueprint(admin_bp)
+    # Register blueprints
+    from app.routes import links_bp
+
+    app.register_blueprint(links_bp)
 
     # Health check endpoint
     @app.route("/health")
