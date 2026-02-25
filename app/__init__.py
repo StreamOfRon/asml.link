@@ -7,12 +7,12 @@ setting up middleware, error handlers, and route blueprints.
 from quart import Quart, jsonify
 
 from app.config import settings
-from app.models import init_db, close_db
 from app.middleware import (
     setup_error_handlers,
     setup_request_logging,
     setup_security_headers_middleware,
 )
+from app.models import close_db, init_db
 
 
 async def create_app() -> Quart:
@@ -48,12 +48,12 @@ async def create_app() -> Quart:
 
     # Register blueprints
     from app.routes import (
+        admin_dashboard_bp,
+        allowlist_bp,
         links_bp,
         redirect_bp,
-        users_bp,
-        allowlist_bp,
-        admin_dashboard_bp,
         user_dashboard_bp,
+        users_bp,
         web_bp,
     )
 

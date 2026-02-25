@@ -2,13 +2,12 @@
 
 import pytest
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from app.models.user import User
 from app.models.oauth_account import OAuthAccount
-from app.utils.validators import is_valid_email
+from app.models.user import User
 
 
 class TestUserCreationFromOAuth:
@@ -144,7 +143,7 @@ class TestOAuthAccountLinking:
         db_session.add(oauth)
         await db_session.commit()
 
-        oauth_id = oauth.id
+        _oauth_id = oauth.id
         await db_session.delete(oauth)
         await db_session.commit()
 

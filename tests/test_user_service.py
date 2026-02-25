@@ -1,12 +1,10 @@
 """User management service tests."""
 
-import pytest
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError
 
-from app.models.user import User
 from app.models.link import Link
+from app.models.user import User
 
 
 class TestUserCreation:
@@ -218,7 +216,7 @@ class TestUserQueries:
         db_session.add(normal)
         await db_session.commit()
 
-        stmt = select(User).where(User.is_admin == True)
+        stmt = select(User).where(User.is_admin.is_(True))
         result = await db_session.execute(stmt)
         admins = result.scalars().all()
         assert len(admins) >= 1
@@ -232,7 +230,7 @@ class TestUserQueries:
         db_session.add(active)
         await db_session.commit()
 
-        stmt = select(User).where(User.is_blocked == True)
+        stmt = select(User).where(User.is_blocked.is_(True))
         result = await db_session.execute(stmt)
         blocked_users = result.scalars().all()
         assert len(blocked_users) >= 1

@@ -2,12 +2,10 @@
 
 from typing import Optional
 
-from quart import Blueprint, redirect, current_app
-from sqlalchemy.ext.asyncio import AsyncSession
+from quart import Blueprint, current_app, redirect
 
 from app.models import get_db
 from app.services.link_service import LinkService
-from app.exceptions import NotFoundError, ForbiddenError
 
 # Create blueprint (no URL prefix - handles root-level routes)
 redirect_bp = Blueprint("redirect", __name__)

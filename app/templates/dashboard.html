@@ -14,7 +14,7 @@
             <i class="fas fa-plus mr-2"></i> New Link
         </button>
     </div>
-    
+
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="stat-card">
@@ -30,7 +30,7 @@
             <div class="stat-label">Avg Hits per Link</div>
         </div>
     </div>
-    
+
     <!-- Tabs -->
     <div class="mb-6">
         <div class="flex border-b border-gray-200">
@@ -42,7 +42,7 @@
             </button>
         </div>
     </div>
-    
+
     <!-- Links Tab -->
     <div id="links-tab" class="tab-content">
         {% if links %}
@@ -111,28 +111,28 @@
             </div>
         {% endif %}
     </div>
-    
+
     <!-- Profile Tab -->
     <div id="profile-tab" class="tab-content hidden">
         <div class="card max-w-md">
             <h2 class="text-xl font-bold text-gray-900 mb-4">Profile Settings</h2>
-            
+
             <form id="profile-form" onsubmit="updateProfile(event)">
                 <div class="form-group">
                     <label class="form-label">Email</label>
                     <input type="email" class="form-input" value="{{ current_user.email }}" disabled>
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Full Name</label>
                     <input type="text" class="form-input" id="full_name" value="{{ current_user.full_name or '' }}">
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Avatar URL</label>
                     <input type="url" class="form-input" id="avatar_url" value="{{ current_user.avatar_url or '' }}">
                 </div>
-                
+
                 <button type="submit" class="btn btn-primary w-full">
                     <i class="fas fa-save mr-2"></i> Save Changes
                 </button>
@@ -147,18 +147,18 @@
         <div class="px-6 py-4 border-b border-gray-200">
             <h2 class="text-xl font-bold text-gray-900">Create New Link</h2>
         </div>
-        
+
         <form id="link-form" onsubmit="createLink(event)" class="px-6 py-4">
             <div class="form-group">
                 <label class="form-label">Original URL</label>
                 <input type="url" class="form-input" id="original_url" required placeholder="https://example.com">
             </div>
-            
+
             <div class="form-group">
                 <label class="form-label">Custom Slug (optional)</label>
                 <input type="text" class="form-input" id="slug" placeholder="Leave empty for random">
             </div>
-            
+
             <div class="form-group">
                 <label class="form-label">
                     <input type="checkbox" id="is_public" checked>
@@ -166,7 +166,7 @@
                 </label>
                 <p class="text-sm text-gray-600 mt-1">Anyone with the link can access it</p>
             </div>
-            
+
             <div class="flex space-x-3">
                 <button type="button" class="flex-1 btn" onclick="closeCreateLinkModal()" style="background-color: #e5e7eb; color: #374151;">Cancel</button>
                 <button type="submit" class="flex-1 btn btn-primary">Create Link</button>
@@ -181,10 +181,10 @@
         document.querySelectorAll('.tab-content').forEach(tab => {
             tab.classList.add('hidden');
         });
-        
+
         // Show selected tab
         document.getElementById(tabName + '-tab').classList.remove('hidden');
-        
+
         // Update tab buttons
         document.querySelectorAll('button[onclick*="switchTab"]').forEach(btn => {
             btn.classList.remove('text-gray-900', 'border-b-2', 'border-blue-600');
@@ -193,23 +193,23 @@
         event.target.closest('button').classList.remove('text-gray-600', 'hover:text-gray-900');
         event.target.closest('button').classList.add('text-gray-900', 'border-b-2', 'border-blue-600');
     }
-    
+
     function openCreateLinkModal() {
         document.getElementById('link-modal').classList.remove('hidden');
     }
-    
+
     function closeCreateLinkModal() {
         document.getElementById('link-modal').classList.add('hidden');
         document.getElementById('link-form').reset();
     }
-    
+
     async function createLink(event) {
         event.preventDefault();
-        
+
         const originalUrl = document.getElementById('original_url').value;
         const slug = document.getElementById('slug').value;
         const isPublic = document.getElementById('is_public').checked;
-        
+
         try {
             const response = await fetch('/api/links', {
                 method: 'POST',
@@ -222,7 +222,7 @@
                     is_public: isPublic,
                 }),
             });
-            
+
             if (response.ok) {
                 showMessage('success', 'Link created successfully!');
                 closeCreateLinkModal();
@@ -235,15 +235,15 @@
             showMessage('error', 'An error occurred: ' + error.message);
         }
     }
-    
+
     async function deleteLink(linkId) {
         if (!confirm('Are you sure you want to delete this link?')) return;
-        
+
         try {
             const response = await fetch(`/api/links/${linkId}`, {
                 method: 'DELETE',
             });
-            
+
             if (response.ok) {
                 showMessage('success', 'Link deleted successfully!');
                 setTimeout(() => window.location.reload(), 1000);
@@ -254,13 +254,13 @@
             showMessage('error', 'An error occurred: ' + error.message);
         }
     }
-    
+
     async function updateProfile(event) {
         event.preventDefault();
-        
+
         const fullName = document.getElementById('full_name').value;
         const avatarUrl = document.getElementById('avatar_url').value;
-        
+
         try {
             const response = await fetch('/api/user/profile', {
                 method: 'PATCH',
@@ -272,7 +272,7 @@
                     avatar_url: avatarUrl,
                 }),
             });
-            
+
             if (response.ok) {
                 showMessage('success', 'Profile updated successfully!');
             } else {
@@ -282,7 +282,7 @@
             showMessage('error', 'An error occurred: ' + error.message);
         }
     }
-    
+
     function showMessage(type, text) {
         const alert = document.createElement('div');
         alert.className = `alert alert-${type}`;

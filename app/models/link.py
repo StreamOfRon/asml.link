@@ -1,11 +1,17 @@
 """Link model."""
 
-from typing import Optional
+from __future__ import annotations
+
 from datetime import datetime
-from sqlalchemy import String, Boolean, Integer, ForeignKey
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from typing import TYPE_CHECKING
+
+from sqlalchemy import Boolean, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models import BaseModel
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 
 class Link(BaseModel):
@@ -29,7 +35,10 @@ class Link(BaseModel):
     user: Mapped["User"] = relationship("User", back_populates="links")
 
     def __repr__(self) -> str:
-        return f"<Link(slug={self.slug!r}, original_url={self.original_url!r}, is_public={self.is_public})>"
+        return (
+            f"<Link(slug={self.slug!r}, original_url={self.original_url!r}, "
+            f"is_public={self.is_public})>"
+        )
 
     def get_allowed_emails(self) -> list[str]:
         """Parse allowed emails from JSON string."""

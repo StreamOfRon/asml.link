@@ -1,14 +1,13 @@
 """Dashboard API routes for admin and user dashboards."""
 
 from quart import Blueprint, jsonify, request
-from sqlalchemy import select, desc
+from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.user import User
+from app.config import settings
 from app.models.link import Link
 from app.services.stats_service import StatsService
 from app.services.user_service import UserService
-from app.config import settings
 
 # Create blueprints
 admin_dashboard_bp = Blueprint("admin_dashboard", __name__, url_prefix="/api/admin/dashboard")
@@ -87,13 +86,16 @@ async def get_admin_dashboard(db_session: AsyncSession):
         "enable_allow_list_mode": settings.ENABLE_ALLOW_LIST_MODE,
     }
 
-    return jsonify(
-        {
-            "stats": stats,
-            "recent_activity": recent_activity,
-            "system_config": system_config,
-        }
-    ), 200
+    return (
+        jsonify(
+            {
+                "stats": stats,
+                "recent_activity": recent_activity,
+                "system_config": system_config,
+            }
+        ),
+        200,
+    )
 
 
 @admin_dashboard_bp.route("/config", methods=["GET"])
@@ -121,16 +123,19 @@ async def get_admin_config(db_session: AsyncSession):
     else:
         db_type = "sqlite"
 
-    return jsonify(
-        {
-            "instance_name": settings.INSTANCE_NAME,
-            "allow_private_links_only": settings.ALLOW_PRIVATE_LINKS_ONLY,
-            "enable_allow_list_mode": settings.ENABLE_ALLOW_LIST_MODE,
-            "total_admins": total_admins,
-            "total_blocked_users": total_blocked,
-            "database_type": db_type,
-        }
-    ), 200
+    return (
+        jsonify(
+            {
+                "instance_name": settings.INSTANCE_NAME,
+                "allow_private_links_only": settings.ALLOW_PRIVATE_LINKS_ONLY,
+                "enable_allow_list_mode": settings.ENABLE_ALLOW_LIST_MODE,
+                "total_admins": total_admins,
+                "total_blocked_users": total_blocked,
+                "database_type": db_type,
+            }
+        ),
+        200,
+    )
 
 
 # User Dashboard Routes
@@ -158,17 +163,20 @@ async def get_user_dashboard(db_session: AsyncSession):
     total_links = await stats_service.get_user_link_count(user_id)
     total_hits = await stats_service.get_user_total_hits(user_id)
 
-    return jsonify(
-        {
-            "id": user.id,
-            "email": user.email,
-            "full_name": user.full_name,
-            "avatar_url": user.avatar_url,
-            "total_links": total_links,
-            "total_hits": total_hits,
-            "created_at": user.created_at.isoformat() if user.created_at else None,
-        }
-    ), 200
+    return (
+        jsonify(
+            {
+                "id": user.id,
+                "email": user.email,
+                "full_name": user.full_name,
+                "avatar_url": user.avatar_url,
+                "total_links": total_links,
+                "total_hits": total_hits,
+                "created_at": user.created_at.isoformat() if user.created_at else None,
+            }
+        ),
+        200,
+    )
 
 
 @user_dashboard_bp.route("/links", methods=["GET"])
@@ -227,12 +235,15 @@ async def get_user_links(db_session: AsyncSession):
 
     total_pages = (total + page_size - 1) // page_size
 
-    return jsonify(
-        {
-            "links": links_data,
-            "total": total,
-            "page": page,
-            "page_size": page_size,
-            "total_pages": total_pages,
-        }
-    ), 200
+    return (
+        jsonify(
+            {
+                "links": links_data,
+                "total": total,
+                "page": page,
+                "page_size": page_size,
+                "total_pages": total_pages,
+            }
+        ),
+        200,
+    )

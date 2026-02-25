@@ -1,12 +1,10 @@
 """Access control and permissions tests."""
 
-import pytest
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.user import User
 from app.models.link import Link
+from app.models.user import User
 
 
 class TestPublicLinkAccess:

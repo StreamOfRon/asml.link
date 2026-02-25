@@ -13,10 +13,10 @@ async function copyToClipboard(text, button) {
         await navigator.clipboard.writeText(text);
         const originalHTML = button.innerHTML;
         const originalClass = button.className;
-        
+
         button.innerHTML = '<i class="fas fa-check"></i> Copied!';
         button.className = 'text-green-600 hover:text-green-800';
-        
+
         setTimeout(() => {
             button.innerHTML = originalHTML;
             button.className = originalClass;
@@ -36,11 +36,11 @@ function showMessage(type, text) {
     const alert = document.createElement('div');
     alert.className = `alert alert-${type} fade-in`;
     alert.textContent = text;
-    
+
     const main = document.querySelector('main');
     if (main) {
         main.insertBefore(alert, main.firstChild);
-        
+
         // Auto-dismiss after 5 seconds
         setTimeout(() => {
             alert.classList.add('fade-out');
@@ -119,17 +119,17 @@ async function apiRequest(url, options = {}) {
             'Content-Type': 'application/json',
         },
     };
-    
+
     const finalOptions = { ...defaultOptions, ...options };
-    
+
     try {
         const response = await fetch(url, finalOptions);
         const data = await response.json();
-        
+
         if (!response.ok) {
             throw new Error(data.message || data.error || 'Request failed');
         }
-        
+
         return data;
     } catch (error) {
         console.error('API error:', error);
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 5000);
         }
     });
-    
+
     // Initialize tooltips
     initTooltips();
 });

@@ -1,9 +1,16 @@
 """OAuth Account model."""
 
-from sqlalchemy import String, Integer, ForeignKey, Index
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from sqlalchemy import ForeignKey, Index, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models import BaseModel
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 
 class OAuthAccount(BaseModel):
@@ -29,4 +36,7 @@ class OAuthAccount(BaseModel):
     )
 
     def __repr__(self) -> str:
-        return f"<OAuthAccount(provider={self.provider!r}, provider_user_id={self.provider_user_id!r})>"
+        return (
+            f"<OAuthAccount(provider={self.provider!r}, "
+            f"provider_user_id={self.provider_user_id!r})>"
+        )

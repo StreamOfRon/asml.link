@@ -2,7 +2,6 @@
 
 import random
 import string
-from typing import Optional
 
 # Base62 character set (0-9, a-z, A-Z)
 BASE62_CHARS = string.digits + string.ascii_lowercase + string.ascii_uppercase

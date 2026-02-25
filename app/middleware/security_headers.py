@@ -1,6 +1,7 @@
 """Security headers middleware for adding security-related HTTP headers."""
 
 from quart import Response
+
 from app.config import settings
 
 

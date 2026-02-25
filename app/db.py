@@ -4,13 +4,11 @@ This module provides utilities for database lifecycle management including
 initialization, migration, and cleanup operations.
 """
 
-import asyncio
 from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import settings
-from app.models import async_engine, async_session, init_db, close_db, Base
+from app.models import Base, async_engine, async_session, close_db, init_db
 
 
 async def initialize_database() -> None:

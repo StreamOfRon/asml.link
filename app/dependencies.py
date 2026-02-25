@@ -15,10 +15,9 @@ from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import get_db
+from app.services.auth_service import AuthService
 from app.services.link_service import LinkService
 from app.services.user_service import UserService
-from app.services.auth_service import AuthService
 
 
 async def get_link_service(db: AsyncSession) -> AsyncGenerator[LinkService, None]:

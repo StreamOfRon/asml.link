@@ -14,7 +14,7 @@
             <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
         </a>
     </div>
-    
+
     <!-- Search and Filter -->
     <div class="card mb-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -48,7 +48,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Users Table -->
     {% if users %}
         <div class="overflow-x-auto card">
@@ -108,7 +108,7 @@
                                             <i class="fas fa-crown"></i>
                                         </button>
                                     {% endif %}
-                                    
+
                                     {% if user.is_blocked %}
                                         <button class="text-green-600 hover:text-green-800" title="Unblock" onclick="unblockUser({{ user.id }})">
                                             <i class="fas fa-unlock"></i>
@@ -118,7 +118,7 @@
                                             <i class="fas fa-lock"></i>
                                         </button>
                                     {% endif %}
-                                    
+
                                     <button class="text-red-600 hover:text-red-800" title="Delete" onclick="deleteUser({{ user.id }})">
                                         <i class="fas fa-trash"></i>
                                     </button>
@@ -142,30 +142,30 @@
         const searchInput = document.getElementById('search-input').value.toLowerCase();
         const statusFilter = document.getElementById('status-filter').value;
         const sortFilter = document.getElementById('sort-filter').value;
-        
+
         const rows = Array.from(document.querySelectorAll('.user-row'));
-        
+
         // Filter
         rows.forEach(row => {
             const email = row.dataset.email.toLowerCase();
             const status = row.dataset.status;
             const admin = row.dataset.admin;
-            
+
             let show = true;
-            
+
             // Search filter
             if (searchInput && !email.includes(searchInput)) {
                 show = false;
             }
-            
+
             // Status filter
             if (statusFilter === 'active' && status !== 'active') show = false;
             if (statusFilter === 'blocked' && status !== 'blocked') show = false;
             if (statusFilter === 'admin' && admin !== 'admin') show = false;
-            
+
             row.style.display = show ? '' : 'none';
         });
-        
+
         // Sort
         const visibleRows = rows.filter(r => r.style.display !== 'none');
         visibleRows.sort((a, b) => {
@@ -182,27 +182,27 @@
                     return 0;
             }
         });
-        
+
         // Reorder DOM
         const tbody = document.getElementById('users-table-body');
         visibleRows.forEach(row => tbody.appendChild(row));
     }
-    
+
     function resetFilters() {
         document.getElementById('search-input').value = '';
         document.getElementById('status-filter').value = '';
         document.getElementById('sort-filter').value = 'newest';
         filterTable();
     }
-    
+
     async function makeAdmin(userId) {
         if (!confirm('Make this user an admin?')) return;
-        
+
         try {
             const response = await fetch(`/api/users/${userId}/admin`, {
                 method: 'POST',
             });
-            
+
             if (response.ok) {
                 showMessage('success', 'User promoted to admin!');
                 setTimeout(() => window.location.reload(), 1000);
@@ -214,15 +214,15 @@
             showMessage('error', 'An error occurred: ' + error.message);
         }
     }
-    
+
     async function blockUser(userId) {
         if (!confirm('Block this user? They will not be able to access the service.')) return;
-        
+
         try {
             const response = await fetch(`/api/users/${userId}/block`, {
                 method: 'POST',
             });
-            
+
             if (response.ok) {
                 showMessage('success', 'User blocked successfully!');
                 setTimeout(() => window.location.reload(), 1000);
@@ -234,15 +234,15 @@
             showMessage('error', 'An error occurred: ' + error.message);
         }
     }
-    
+
     async function unblockUser(userId) {
         if (!confirm('Unblock this user?')) return;
-        
+
         try {
             const response = await fetch(`/api/users/${userId}/unblock`, {
                 method: 'POST',
             });
-            
+
             if (response.ok) {
                 showMessage('success', 'User unblocked successfully!');
                 setTimeout(() => window.location.reload(), 1000);
@@ -254,15 +254,15 @@
             showMessage('error', 'An error occurred: ' + error.message);
         }
     }
-    
+
     async function deleteUser(userId) {
         if (!confirm('Delete this user? This action cannot be undone. All their links will be deleted.')) return;
-        
+
         try {
             const response = await fetch(`/api/users/${userId}`, {
                 method: 'DELETE',
             });
-            
+
             if (response.ok) {
                 showMessage('success', 'User deleted successfully!');
                 setTimeout(() => window.location.reload(), 1000);
@@ -274,7 +274,7 @@
             showMessage('error', 'An error occurred: ' + error.message);
         }
     }
-    
+
     function showMessage(type, text) {
         const alert = document.createElement('div');
         alert.className = `alert alert-${type}`;

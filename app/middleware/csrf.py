@@ -1,13 +1,12 @@
 """CSRF protection middleware for preventing cross-site request forgery attacks."""
 
-import secrets
 import hmac
-import hashlib
-from datetime import datetime, timedelta, UTC
+import secrets
+from datetime import UTC, datetime, timedelta
 from typing import Optional
-from urllib.parse import urlparse
 
-from quart import request, session, current_app
+from quart import request, session
+
 from app.config import settings
 
 

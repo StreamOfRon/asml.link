@@ -1,7 +1,10 @@
 """Rate limit entry model."""
 
+from __future__ import annotations
+
 from datetime import datetime
-from sqlalchemy import String, Integer, DateTime, func
+
+from sqlalchemy import DateTime, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models import BaseModel
@@ -22,4 +25,7 @@ class RateLimitEntry(BaseModel):
     )
 
     def __repr__(self) -> str:
-        return f"<RateLimitEntry(ip={self.ip_address}, endpoint={self.endpoint}, hits={self.hit_count})>"
+        return (
+            f"<RateLimitEntry(ip={self.ip_address}, endpoint={self.endpoint}, "
+            f"hits={self.hit_count})>"
+        )

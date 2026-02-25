@@ -1,22 +1,22 @@
 """Link service for managing shortened links."""
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Optional
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.exceptions import (
+    ConflictError,
+    ForbiddenError,
+    NotFoundError,
+    ValidationError,
+)
 from app.models.link import Link
 from app.models.user import User
 from app.utils.slug_generator import generate_random_slug, validate_slug
 from app.utils.validators import is_valid_url
-from app.exceptions import (
-    ValidationError,
-    NotFoundError,
-    ForbiddenError,
-    ConflictError,
-)
 
 
 class LinkService:
@@ -234,7 +234,7 @@ class LinkService:
         stmt = select(Link).where(Link.user_id == user_id)
 
         if not include_private:
-            stmt = stmt.where(Link.is_public == True)
+            stmt = stmt.where(Link.is_public)
 
         result = await self.db.execute(stmt)
         return result.scalars().all()

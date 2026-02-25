@@ -14,31 +14,31 @@
             <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
         </a>
     </div>
-    
+
     <!-- Add Email Form -->
     <div class="card mb-8 max-w-md">
         <h2 class="text-lg font-bold text-gray-900 mb-4">
             <i class="fas fa-plus-circle mr-2 text-blue-600"></i> Add Email to Allow-list
         </h2>
-        
+
         <form id="add-email-form" onsubmit="addEmail(event)">
             <div class="form-group">
                 <label class="form-label">Email Address</label>
-                <input 
-                    type="email" 
-                    class="form-input" 
-                    id="email-input" 
-                    placeholder="user@example.com" 
+                <input
+                    type="email"
+                    class="form-input"
+                    id="email-input"
+                    placeholder="user@example.com"
                     required
                 >
             </div>
-            
+
             <button type="submit" class="btn btn-primary w-full">
                 <i class="fas fa-plus mr-2"></i> Add to Allow-list
             </button>
         </form>
     </div>
-    
+
     <!-- Information Box -->
     <div class="card mb-8 bg-blue-50 border-l-4" style="border-left-color: var(--primary);">
         <div class="flex items-start">
@@ -53,14 +53,14 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Allow-list Emails -->
     {% if allow_list %}
         <div class="card">
             <h2 class="text-lg font-bold text-gray-900 mb-4">
                 <i class="fas fa-list mr-2 text-green-600"></i> Allowed Emails ({{ allow_list|length }})
             </h2>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {% for entry in allow_list %}
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
@@ -70,8 +70,8 @@
                                 Added: {{ entry.created_at.strftime('%Y-%m-%d %H:%M') }}
                             </p>
                         </div>
-                        <button 
-                            class="text-red-600 hover:text-red-800 ml-3" 
+                        <button
+                            class="text-red-600 hover:text-red-800 ml-3"
                             title="Remove"
                             onclick="removeEmail('{{ entry.email }}', this)"
                         >
@@ -93,17 +93,17 @@
 <script>
     async function addEmail(event) {
         event.preventDefault();
-        
+
         const emailInput = document.getElementById('email-input');
         const email = emailInput.value.trim();
-        
+
         // Basic validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$|^\*\.[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
             showMessage('error', 'Please enter a valid email address or domain pattern');
             return;
         }
-        
+
         try {
             const response = await fetch('/api/admin/allow-list', {
                 method: 'POST',
@@ -112,7 +112,7 @@
                 },
                 body: JSON.stringify({ email }),
             });
-            
+
             if (response.ok) {
                 showMessage('success', `Email "${email}" added to allow-list!`);
                 emailInput.value = '';
@@ -125,15 +125,15 @@
             showMessage('error', 'An error occurred: ' + error.message);
         }
     }
-    
+
     async function removeEmail(email, button) {
         if (!confirm(`Remove "${email}" from allow-list?`)) return;
-        
+
         try {
             const response = await fetch(`/api/admin/allow-list/${encodeURIComponent(email)}`, {
                 method: 'DELETE',
             });
-            
+
             if (response.ok) {
                 showMessage('success', `Email "${email}" removed from allow-list!`);
                 setTimeout(() => window.location.reload(), 1000);
@@ -145,7 +145,7 @@
             showMessage('error', 'An error occurred: ' + error.message);
         }
     }
-    
+
     function showMessage(type, text) {
         const alert = document.createElement('div');
         alert.className = `alert alert-${type}`;

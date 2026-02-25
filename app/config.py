@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from pydantic import Field, ConfigDict
+from pydantic import ConfigDict, Field
 from pydantic_settings import BaseSettings
 
 

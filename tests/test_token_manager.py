@@ -1,9 +1,7 @@
 """Tests for JWT token management utilities."""
 
-import asyncio
-from datetime import timedelta, datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-import pytest
 import jwt
 
 from app.config import settings

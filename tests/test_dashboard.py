@@ -1,12 +1,11 @@
 """Integration tests for dashboard endpoints."""
 
-import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.user import User
 from app.models.link import Link
-from app.services.stats_service import StatsService
+from app.models.user import User
 from app.services.link_service import LinkService
+from app.services.stats_service import StatsService
 from app.services.user_service import UserService
 
 
@@ -64,7 +63,7 @@ class TestStatsService:
 
         # Create user without links
         user_service = UserService(db_session)
-        user_no_links = await user_service.create_user(
+        _user_no_links = await user_service.create_user(
             email="nolinks@example.com",
             full_name="No Links",
         )
@@ -233,7 +232,7 @@ class TestAdminDashboardEndpoints:
         """Test admin dashboard returns statistics."""
         # Verify admin has access to stats
         link_service = LinkService(db_session)
-        user_service = UserService(db_session)
+        _user_service = UserService(db_session)
         stats_service = StatsService(db_session)
 
         # Create test data
@@ -333,7 +332,7 @@ class TestUserDashboardEndpoints:
             )
 
         # Get paginated links (first 10)
-        from sqlalchemy import select, desc
+        from sqlalchemy import desc, select
 
         result = await db_session.execute(
             select(Link)
@@ -394,7 +393,7 @@ class TestUserDashboardEndpoints:
             links.append(link)
 
         # Verify order (should be in creation order)
-        from sqlalchemy import select, desc
+        from sqlalchemy import desc, select
 
         result = await db_session.execute(
             select(Link).where(Link.user_id == test_user.id).order_by(desc(Link.created_at))

@@ -3,15 +3,15 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.link_service import LinkService
-from app.models.user import User
-from app.models.link import Link
 from app.exceptions import (
-    ValidationError,
-    NotFoundError,
-    ForbiddenError,
     ConflictError,
+    ForbiddenError,
+    NotFoundError,
+    ValidationError,
 )
+from app.models.link import Link
+from app.models.user import User
+from app.services.link_service import LinkService
 
 
 class TestLinkServiceCreate:
@@ -68,7 +68,7 @@ class TestLinkServiceCreate:
         """Test creating link with duplicate slug raises error."""
         service = LinkService(db_session)
 
-        link1 = await service.create_link(
+        _link1 = await service.create_link(
             user_id=test_user.id,
             original_url="https://example.com/1",
             slug="duplicate",

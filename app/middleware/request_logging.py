@@ -1,10 +1,12 @@
 """Structured request logging middleware for audit trails and debugging."""
 
 import json
-import uuid
 import time
-from datetime import datetime, UTC
-from quart import Request, Response, has_request_context, g
+import uuid
+from datetime import UTC, datetime
+
+from quart import Response, g, has_request_context
+
 from app.config import settings
 
 

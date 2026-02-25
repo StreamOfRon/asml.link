@@ -97,16 +97,16 @@ async def create_link(
     is_public: bool = True,
 ) -> Link:
     """Create a shortened link.
-    
+
     Args:
         db_session: Database session
         user_id: User creating the link
         original_url: URL to shorten
         is_public: Whether link is public
-        
+
     Returns:
         Created Link object
-        
+
     Raises:
         ValidationError: If validation fails
         ConflictError: If slug already exists

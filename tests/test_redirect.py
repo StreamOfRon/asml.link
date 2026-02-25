@@ -1,10 +1,8 @@
 """Integration tests for redirect endpoint and access control."""
 
-import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
-from app.models.link import Link
 from app.services.link_service import LinkService
 
 

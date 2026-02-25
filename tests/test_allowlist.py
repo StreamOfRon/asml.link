@@ -1,13 +1,13 @@
 """Integration tests for allow-list management API endpoints."""
 
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.allow_list_entry import AllowListEntry
 from app.models.user import User
 from app.services.link_service import LinkService
-from app.utils.validators import normalize_email, is_valid_email
+from app.utils.validators import is_valid_email, normalize_email
 
 
 class TestAllowListEndpoints:

@@ -4,13 +4,12 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import create_app
-from app.models.user import User
-from app.models.link import Link
+from app.exceptions import ConflictError, ForbiddenError
 from app.models.allow_list_entry import AllowListEntry
+from app.models.user import User
+from app.services.auth_service import AuthService
 from app.services.link_service import LinkService
 from app.services.user_service import UserService
-from app.services.auth_service import AuthService
-from app.exceptions import ValidationError, ForbiddenError, NotFoundError, ConflictError
 
 
 # Module-level fixture for test client
@@ -185,22 +184,16 @@ class TestLinkCreationAndRedirectWorkflow:
         assert link.is_public is False
         assert link.get_allowed_emails() == allowed_emails
 
-    async def test_multiple_users_create_different_links(
-        self, db_session: AsyncSession
-    ):
+    async def test_multiple_users_create_different_links(self, db_session: AsyncSession):
         """Test multiple users can create links with different slugs."""
         user_service = UserService(db_session)
         link_service = LinkService(db_session)
 
         # Create user 1
-        user1 = await user_service.create_user(
-            email="user1@example.com", full_name="User One"
-        )
+        user1 = await user_service.create_user(email="user1@example.com", full_name="User One")
 
         # Create user 2
-        user2 = await user_service.create_user(
-            email="user2@example.com", full_name="User Two"
-        )
+        user2 = await user_service.create_user(email="user2@example.com", full_name="User Two")
 
         # User 1 creates a link
         link1 = await link_service.create_link(
@@ -222,9 +215,7 @@ class TestLinkCreationAndRedirectWorkflow:
         assert link2.user_id == user2.id
         assert link1.slug != link2.slug
 
-    async def test_duplicate_slug_rejected(
-        self, db_session: AsyncSession, test_user: User
-    ):
+    async def test_duplicate_slug_rejected(self, db_session: AsyncSession, test_user: User):
         """Test that duplicate slugs are rejected."""
         link_service = LinkService(db_session)
 
@@ -245,9 +236,7 @@ class TestLinkCreationAndRedirectWorkflow:
                 is_public=True,
             )
 
-    async def test_user_can_update_own_link(
-        self, db_session: AsyncSession, test_user: User
-    ):
+    async def test_user_can_update_own_link(self, db_session: AsyncSession, test_user: User):
         """Test user can update their own link."""
         link_service = LinkService(db_session)
 
@@ -270,20 +259,14 @@ class TestLinkCreationAndRedirectWorkflow:
         assert updated_link.original_url == "https://example.com/updated"
         assert updated_link.is_public is False
 
-    async def test_user_cannot_update_others_link(
-        self, db_session: AsyncSession
-    ):
+    async def test_user_cannot_update_others_link(self, db_session: AsyncSession):
         """Test user cannot update another user's link."""
         user_service = UserService(db_session)
         link_service = LinkService(db_session)
 
         # Create two users
-        user1 = await user_service.create_user(
-            email="user1@example.com", full_name="User 1"
-        )
-        user2 = await user_service.create_user(
-            email="user2@example.com", full_name="User 2"
-        )
+        user1 = await user_service.create_user(email="user1@example.com", full_name="User 1")
+        user2 = await user_service.create_user(email="user2@example.com", full_name="User 2")
 
         # User1 creates a link
         link = await link_service.create_link(
@@ -301,9 +284,7 @@ class TestLinkCreationAndRedirectWorkflow:
                 original_url="https://example.com/hacked",
             )
 
-    async def test_user_can_delete_own_link(
-        self, db_session: AsyncSession, test_user: User
-    ):
+    async def test_user_can_delete_own_link(self, db_session: AsyncSession, test_user: User):
         """Test user can delete their own link."""
         link_service = LinkService(db_session)
 
@@ -385,9 +366,7 @@ class TestPrivateLinkAccessControl:
 class TestAdminOperationsIntegration:
     """Test admin operations and user management workflows."""
 
-    async def test_admin_can_promote_user(
-        self, db_session: AsyncSession, test_user: User
-    ):
+    async def test_admin_can_promote_user(self, db_session: AsyncSession, test_user: User):
         """Test admin can promote user to admin."""
         user_service = UserService(db_session)
 
@@ -399,9 +378,7 @@ class TestAdminOperationsIntegration:
         promoted_user = await user_service.promote_to_admin(test_user.id)
         assert promoted_user.is_admin is True
 
-    async def test_admin_can_demote_admin(
-        self, db_session: AsyncSession, test_admin_user: User
-    ):
+    async def test_admin_can_demote_admin(self, db_session: AsyncSession, test_admin_user: User):
         """Test admin can demote another admin."""
         user_service = UserService(db_session)
 
@@ -413,9 +390,7 @@ class TestAdminOperationsIntegration:
         demoted_user = await user_service.demote_from_admin(test_admin_user.id)
         assert demoted_user.is_admin is False
 
-    async def test_admin_can_block_user(
-        self, db_session: AsyncSession, test_user: User
-    ):
+    async def test_admin_can_block_user(self, db_session: AsyncSession, test_user: User):
         """Test admin can block a user."""
         user_service = UserService(db_session)
 
@@ -427,9 +402,7 @@ class TestAdminOperationsIntegration:
         blocked_user = await user_service.block_user(test_user.id)
         assert blocked_user.is_blocked is True
 
-    async def test_admin_can_unblock_user(
-        self, db_session: AsyncSession, test_user: User
-    ):
+    async def test_admin_can_unblock_user(self, db_session: AsyncSession, test_user: User):
         """Test admin can unblock a user."""
         user_service = UserService(db_session)
 
@@ -440,15 +413,13 @@ class TestAdminOperationsIntegration:
         unblocked_user = await user_service.unblock_user(test_user.id)
         assert unblocked_user.is_blocked is False
 
-    async def test_admin_can_delete_user(
-        self, db_session: AsyncSession, test_user: User
-    ):
+    async def test_admin_can_delete_user(self, db_session: AsyncSession, test_user: User):
         """Test admin can delete a user and cascade-delete their links."""
         user_service = UserService(db_session)
         link_service = LinkService(db_session)
 
         # Create a link for the user
-        link = await link_service.create_link(
+        _link = await link_service.create_link(
             user_id=test_user.id,
             original_url="https://example.com/link",
             slug="link",
@@ -491,9 +462,7 @@ class TestAdminOperationsIntegration:
 class TestEndToEndUserWorkflow:
     """Test complete user workflows from signup to link creation."""
 
-    async def test_complete_user_signup_and_link_creation_workflow(
-        self, db_session: AsyncSession
-    ):
+    async def test_complete_user_signup_and_link_creation_workflow(self, db_session: AsyncSession):
         """Test: User registers via OAuth → Creates link → Link is retrieved."""
         auth_service = AuthService(db_session)
         link_service = LinkService(db_session)
@@ -524,9 +493,7 @@ class TestEndToEndUserWorkflow:
         # Step 3: Anyone can access the link
         retrieved_link = await link_service.get_link_by_slug("opencode")
         assert retrieved_link is not None
-        assert (
-            retrieved_link.original_url == "https://github.com/anomalyco/opencode"
-        )
+        assert retrieved_link.original_url == "https://github.com/anomalyco/opencode"
 
         # Step 4: Track hit
         updated_link = await link_service.increment_hit_count("opencode")
@@ -574,17 +541,13 @@ class TestEndToEndUserWorkflow:
         assert restricted_link.is_public is False
         assert restricted_link.get_allowed_emails() == ["vip@example.com"]
 
-    async def test_admin_manages_users_and_their_links(
-        self, db_session: AsyncSession
-    ):
+    async def test_admin_manages_users_and_their_links(self, db_session: AsyncSession):
         """Test: Admin can view, manage, and delete users and their links."""
         user_service = UserService(db_session)
         link_service = LinkService(db_session)
 
         # Create admin and regular user
-        admin = await user_service.create_user(
-            email="admin@example.com", full_name="Admin User"
-        )
+        admin = await user_service.create_user(email="admin@example.com", full_name="Admin User")
         await user_service.promote_to_admin(admin.id)
 
         user = await user_service.create_user(
@@ -592,14 +555,14 @@ class TestEndToEndUserWorkflow:
         )
 
         # User creates links
-        link1 = await link_service.create_link(
+        _link1 = await link_service.create_link(
             user_id=user.id,
             original_url="https://example.com/link1",
             slug="link1",
             is_public=True,
         )
 
-        link2 = await link_service.create_link(
+        _link2 = await link_service.create_link(
             user_id=user.id,
             original_url="https://example.com/link2",
             slug="link2",
@@ -607,9 +570,7 @@ class TestEndToEndUserWorkflow:
         )
 
         # Admin gets all user links
-        user_links = await link_service.get_user_links(
-            user.id, include_private=True
-        )
+        user_links = await link_service.get_user_links(user.id, include_private=True)
         assert len(user_links) == 2
 
         # Admin blocks user
@@ -636,9 +597,7 @@ class TestEndToEndUserWorkflow:
 class TestAdminEndToEndWorkflow:
     """Test complete admin workflows."""
 
-    async def test_admin_manages_allow_list_and_users(
-        self, db_session: AsyncSession
-    ):
+    async def test_admin_manages_allow_list_and_users(self, db_session: AsyncSession):
         """Test: Admin adds emails to allow-list and manages users."""
         # Add emails to allow-list
         allowed_emails = ["user1@corp.com", "user2@corp.com", "user3@corp.com"]
@@ -653,30 +612,23 @@ class TestAdminEndToEndWorkflow:
         query_result = await db_session.get(AllowListEntry, 1)
         assert query_result is not None
 
-    async def test_admin_views_system_statistics(
-        self, db_session: AsyncSession
-    ):
+    async def test_admin_views_system_statistics(self, db_session: AsyncSession):
         """Test: Admin can view aggregate system statistics."""
         user_service = UserService(db_session)
         link_service = LinkService(db_session)
 
         # Create multiple users
-        user1 = await user_service.create_user(
-            email="user1stats@example.com", full_name="User 1"
-        )
-        user2 = await user_service.create_user(
-            email="user2stats@example.com", full_name="User 2"
-        )
+        user1 = await user_service.create_user(email="user1stats@example.com", full_name="User 1")
+        user2 = await user_service.create_user(email="user2stats@example.com", full_name="User 2")
 
         # Create multiple links
-        link1 = await link_service.create_link(
+        _link1 = await link_service.create_link(
             user_id=user1.id,
             original_url="https://example.com/u1l1",
             slug="u1l1",
             is_public=True,
         )
-
-        link2 = await link_service.create_link(
+        _link2 = await link_service.create_link(
             user_id=user2.id,
             original_url="https://example.com/u2l1",
             slug="u2l1",
