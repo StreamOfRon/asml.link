@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Link Shortener{% endblock %}
+
+{% block content %}
+<div class="py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+            <p class="text-gray-600 mt-1">Welcome back, {{ current_user.full_name or current_user.email }}</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCreateLinkModal()">
+            <i class="fas fa-plus mr-2"></i> New Link
+        </button>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_links }}</div>
+            <div class="stat-label">Total Links</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ total_hits }}</div>
+            <div class="stat-label">Total Hits</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ avg_hits }}</div>
+            <div class="stat-label">Avg Hits per Link</div>
+        </div>
+    </div>
+    
+    <!-- Tabs -->
+    <div class="mb-6">
+        <div class="flex border-b border-gray-200">
+            <button class="px-4 py-2 font-medium text-gray-900 border-b-2 border-blue-600" onclick="switchTab('links')">
+                <i class="fas fa-link mr-2"></i> My Links
+            </button>
+            <button class="px-4 py-2 font-medium text-gray-600 hover:text-gray-900" onclick="switchTab('profile')">
+                <i class="fas fa-user mr-2"></i> Profile
+            </button>
+        </div>
+    </div>
+    
+    <!-- Links Tab -->
+    <div id="links-tab" class="tab-content">
+        {% if links %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Slug</th>
+                            <th>Original URL</th>
+                            <th>Visibility</th>
+                            <th>Hits</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for link in links %}
+                            <tr>
+                                <td>
+                                    <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{{ link.slug }}</code>
+                                </td>
+                                <td>
+                                    <a href="{{ link.original_url }}" target="_blank" class="text-blue-600 hover:text-blue-800 truncate" title="{{ link.original_url }}">
+                                        {{ link.original_url[:50] }}{% if link.original_url|length > 50 %}...{% endif %}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if link.is_public %}
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-globe mr-1"></i> Public
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-warning">
+                                            <i class="fas fa-lock mr-1"></i> Private
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ link.hit_count }}</td>
+                                <td class="text-sm text-gray-600">{{ link.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                <td>
+                                    <div class="flex space-x-2">
+                                        <button class="text-blue-600 hover:text-blue-800" title="Copy" onclick="copyToClipboard('{{ request.host_url }}{{ link.slug }}', this)">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                        <button class="text-blue-600 hover:text-blue-800" title="Edit" onclick="editLink({{ link.id }})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="text-red-600 hover:text-red-800" title="Delete" onclick="deleteLink({{ link.id }})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-link text-gray-400 text-4xl mb-4 block"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No links yet</h3>
+                <p class="text-gray-600 mb-4">Create your first shortened link to get started</p>
+                <button class="btn btn-primary" onclick="openCreateLinkModal()">
+                    <i class="fas fa-plus mr-2"></i> Create Link
+                </button>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Profile Tab -->
+    <div id="profile-tab" class="tab-content hidden">
+        <div class="card max-w-md">
+            <h2 class="text-xl font-bold text-gray-900 mb-4">Profile Settings</h2>
+            
+            <form id="profile-form" onsubmit="updateProfile(event)">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" value="{{ current_user.email }}" disabled>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="full_name" value="{{ current_user.full_name or '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Avatar URL</label>
+                    <input type="url" class="form-input" id="avatar_url" value="{{ current_user.avatar_url or '' }}">
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-full">
+                    <i class="fas fa-save mr-2"></i> Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Link Modal -->
+<div id="link-modal" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-gray-900">Create New Link</h2>
+        </div>
+        
+        <form id="link-form" onsubmit="createLink(event)" class="px-6 py-4">
+            <div class="form-group">
+                <label class="form-label">Original URL</label>
+                <input type="url" class="form-input" id="original_url" required placeholder="https://example.com">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Custom Slug (optional)</label>
+                <input type="text" class="form-input" id="slug" placeholder="Leave empty for random">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">
+                    <input type="checkbox" id="is_public" checked>
+                    <span>Public Link</span>
+                </label>
+                <p class="text-sm text-gray-600 mt-1">Anyone with the link can access it</p>
+            </div>
+            
+            <div class="flex space-x-3">
+                <button type="button" class="flex-1 btn" onclick="closeCreateLinkModal()" style="background-color: #e5e7eb; color: #374151;">Cancel</button>
+                <button type="submit" class="flex-1 btn btn-primary">Create Link</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.add('hidden');
+        });
+        
+        // Show selected tab
+        document.getElementById(tabName + '-tab').classList.remove('hidden');
+        
+        // Update tab buttons
+        document.querySelectorAll('button[onclick*="switchTab"]').forEach(btn => {
+            btn.classList.remove('text-gray-900', 'border-b-2', 'border-blue-600');
+            btn.classList.add('text-gray-600', 'hover:text-gray-900');
+        });
+        event.target.closest('button').classList.remove('text-gray-600', 'hover:text-gray-900');
+        event.target.closest('button').classList.add('text-gray-900', 'border-b-2', 'border-blue-600');
+    }
+    
+    function openCreateLinkModal() {
+        document.getElementById('link-modal').classList.remove('hidden');
+    }
+    
+    function closeCreateLinkModal() {
+        document.getElementById('link-modal').classList.add('hidden');
+        document.getElementById('link-form').reset();
+    }
+    
+    async function createLink(event) {
+        event.preventDefault();
+        
+        const originalUrl = document.getElementById('original_url').value;
+        const slug = document.getElementById('slug').value;
+        const isPublic = document.getElementById('is_public').checked;
+        
+        try {
+            const response = await fetch('/api/links', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    original_url: originalUrl,
+                    slug: slug || null,
+                    is_public: isPublic,
+                }),
+            });
+            
+            if (response.ok) {
+                showMessage('success', 'Link created successfully!');
+                closeCreateLinkModal();
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                const error = await response.json();
+                showMessage('error', error.message || 'Failed to create link');
+            }
+        } catch (error) {
+            showMessage('error', 'An error occurred: ' + error.message);
+        }
+    }
+    
+    async function deleteLink(linkId) {
+        if (!confirm('Are you sure you want to delete this link?')) return;
+        
+        try {
+            const response = await fetch(`/api/links/${linkId}`, {
+                method: 'DELETE',
+            });
+            
+            if (response.ok) {
+                showMessage('success', 'Link deleted successfully!');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showMessage('error', 'Failed to delete link');
+            }
+        } catch (error) {
+            showMessage('error', 'An error occurred: ' + error.message);
+        }
+    }
+    
+    async function updateProfile(event) {
+        event.preventDefault();
+        
+        const fullName = document.getElementById('full_name').value;
+        const avatarUrl = document.getElementById('avatar_url').value;
+        
+        try {
+            const response = await fetch('/api/user/profile', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    full_name: fullName,
+                    avatar_url: avatarUrl,
+                }),
+            });
+            
+            if (response.ok) {
+                showMessage('success', 'Profile updated successfully!');
+            } else {
+                showMessage('error', 'Failed to update profile');
+            }
+        } catch (error) {
+            showMessage('error', 'An error occurred: ' + error.message);
+        }
+    }
+    
+    function showMessage(type, text) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type}`;
+        alert.textContent = text;
+        document.querySelector('main').insertBefore(alert, document.querySelector('main').firstChild);
+    }
+</script>
+{% endblock %}

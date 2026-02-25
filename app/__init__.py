@@ -52,8 +52,10 @@ async def create_app() -> Quart:
         allowlist_bp,
         admin_dashboard_bp,
         user_dashboard_bp,
+        web_bp,
     )
 
+    app.register_blueprint(web_bp)
     app.register_blueprint(links_bp)
     app.register_blueprint(users_bp)
     app.register_blueprint(allowlist_bp)

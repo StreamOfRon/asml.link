@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Allow-list Management - Link Shortener{% endblock %}
+
+{% block content %}
+<div class="py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Allow-list Management</h1>
+            <p class="text-gray-600 mt-1">Control which email addresses can sign up</p>
+        </div>
+        <a href="/admin" class="btn btn-secondary">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+        </a>
+    </div>
+    
+    <!-- Add Email Form -->
+    <div class="card mb-8 max-w-md">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">
+            <i class="fas fa-plus-circle mr-2 text-blue-600"></i> Add Email to Allow-list
+        </h2>
+        
+        <form id="add-email-form" onsubmit="addEmail(event)">
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input 
+                    type="email" 
+                    class="form-input" 
+                    id="email-input" 
+                    placeholder="user@example.com" 
+                    required
+                >
+            </div>
+            
+            <button type="submit" class="btn btn-primary w-full">
+                <i class="fas fa-plus mr-2"></i> Add to Allow-list
+            </button>
+        </form>
+    </div>
+    
+    <!-- Information Box -->
+    <div class="card mb-8 bg-blue-50 border-l-4" style="border-left-color: var(--primary);">
+        <div class="flex items-start">
+            <i class="fas fa-info-circle text-blue-600 text-lg mr-3 mt-1"></i>
+            <div>
+                <h3 class="font-semibold text-gray-900 mb-1">Allow-list Settings</h3>
+                <ul class="text-sm text-gray-700 list-disc list-inside space-y-1">
+                    <li>When enabled, only emails in the allow-list can sign up</li>
+                    <li>Add wildcard domains (e.g., *.example.com) to allow all subdomains</li>
+                    <li>Existing users are not affected by allow-list changes</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Allow-list Emails -->
+    {% if allow_list %}
+        <div class="card">
+            <h2 class="text-lg font-bold text-gray-900 mb-4">
+                <i class="fas fa-list mr-2 text-green-600"></i> Allowed Emails ({{ allow_list|length }})
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {% for entry in allow_list %}
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
+                        <div>
+                            <p class="font-mono text-sm text-gray-900">{{ entry.email }}</p>
+                            <p class="text-xs text-gray-600 mt-1">
+                                Added: {{ entry.created_at.strftime('%Y-%m-%d %H:%M') }}
+                            </p>
+                        </div>
+                        <button 
+                            class="text-red-600 hover:text-red-800 ml-3" 
+                            title="Remove"
+                            onclick="removeEmail('{{ entry.email }}', this)"
+                        >
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center py-12 card">
+            <i class="fas fa-list text-gray-400 text-4xl mb-4 block"></i>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No emails in allow-list</h3>
+            <p class="text-gray-600">Add the first email above to get started</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    async function addEmail(event) {
+        event.preventDefault();
+        
+        const emailInput = document.getElementById('email-input');
+        const email = emailInput.value.trim();
+        
+        // Basic validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$|^\*\.[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            showMessage('error', 'Please enter a valid email address or domain pattern');
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/admin/allow-list', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            });
+            
+            if (response.ok) {
+                showMessage('success', `Email "${email}" added to allow-list!`);
+                emailInput.value = '';
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                const error = await response.json();
+                showMessage('error', error.message || 'Failed to add email');
+            }
+        } catch (error) {
+            showMessage('error', 'An error occurred: ' + error.message);
+        }
+    }
+    
+    async function removeEmail(email, button) {
+        if (!confirm(`Remove "${email}" from allow-list?`)) return;
+        
+        try {
+            const response = await fetch(`/api/admin/allow-list/${encodeURIComponent(email)}`, {
+                method: 'DELETE',
+            });
+            
+            if (response.ok) {
+                showMessage('success', `Email "${email}" removed from allow-list!`);
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                const error = await response.json();
+                showMessage('error', error.message || 'Failed to remove email');
+            }
+        } catch (error) {
+            showMessage('error', 'An error occurred: ' + error.message);
+        }
+    }
+    
+    function showMessage(type, text) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type}`;
+        alert.textContent = text;
+        document.querySelector('main').insertBefore(alert, document.querySelector('main').firstChild);
+    }
+</script>
+{% endblock %}

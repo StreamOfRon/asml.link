@@ -5,6 +5,7 @@ from app.routes.redirect import redirect_bp
 from app.routes.users import users_bp
 from app.routes.allowlist import allowlist_bp
 from app.routes.dashboard import admin_dashboard_bp, user_dashboard_bp
+from app.routes.web import web_bp
 
 __all__ = [
     "links_bp",
@@ -13,4 +14,5 @@ __all__ = [
     "allowlist_bp",
     "admin_dashboard_bp",
     "user_dashboard_bp",
+    "web_bp",
 ]

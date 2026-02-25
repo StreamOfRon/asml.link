@@ -1,0 +1,240 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Link Shortener{% endblock %}
+
+{% block content %}
+<div class="py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <p class="text-gray-600 mt-1">System statistics and management</p>
+        </div>
+        <a href="/admin/users" class="btn btn-primary">
+            <i class="fas fa-users mr-2"></i> Manage Users
+        </a>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_users }}</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ total_links }}</div>
+            <div class="stat-label">Total Links</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ total_hits }}</div>
+            <div class="stat-label">Total Hits</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ active_users }}</div>
+            <div class="stat-label">Active Users (7d)</div>
+        </div>
+    </div>
+    
+    <!-- Tabs -->
+    <div class="mb-6">
+        <div class="flex border-b border-gray-200">
+            <button class="px-4 py-2 font-medium text-gray-900 border-b-2 border-blue-600" onclick="switchTab('overview')">
+                <i class="fas fa-chart-bar mr-2"></i> Overview
+            </button>
+            <button class="px-4 py-2 font-medium text-gray-600 hover:text-gray-900" onclick="switchTab('users')">
+                <i class="fas fa-users mr-2"></i> Recent Users
+            </button>
+            <button class="px-4 py-2 font-medium text-gray-600 hover:text-gray-900" onclick="switchTab('links')">
+                <i class="fas fa-link mr-2"></i> Recent Links
+            </button>
+        </div>
+    </div>
+    
+    <!-- Overview Tab -->
+    <div id="overview-tab" class="tab-content">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="card">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-info-circle mr-2 text-blue-600"></i> System Info
+                </h3>
+                <dl class="space-y-3">
+                    <div class="flex justify-between">
+                        <dt class="text-gray-600">Admin Users:</dt>
+                        <dd class="font-semibold text-gray-900">{{ admin_count }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-600">Blocked Users:</dt>
+                        <dd class="font-semibold text-gray-900">{{ blocked_count }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-600">Public Links:</dt>
+                        <dd class="font-semibold text-gray-900">{{ public_links_count }}</dd>
+                    </div>
+                    <div class="flex justify-between">
+                        <dt class="text-gray-600">Private Links:</dt>
+                        <dd class="font-semibold text-gray-900">{{ private_links_count }}</dd>
+                    </div>
+                </dl>
+            </div>
+            
+            <div class="card">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">
+                    <i class="fas fa-cog mr-2 text-green-600"></i> Quick Actions
+                </h3>
+                <div class="space-y-3">
+                    <a href="/admin/users" class="block p-3 bg-gray-50 hover:bg-gray-100 rounded text-gray-700 no-underline">
+                        <i class="fas fa-users mr-2 text-blue-600"></i> Manage Users & Permissions
+                    </a>
+                    <a href="/admin/allow-list" class="block p-3 bg-gray-50 hover:bg-gray-100 rounded text-gray-700 no-underline">
+                        <i class="fas fa-list mr-2 text-green-600"></i> Manage Allow-list
+                    </a>
+                    <a href="/dashboard" class="block p-3 bg-gray-50 hover:bg-gray-100 rounded text-gray-700 no-underline">
+                        <i class="fas fa-chart-line mr-2 text-purple-600"></i> View My Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Users Tab -->
+    <div id="users-tab" class="tab-content hidden">
+        {% if recent_users %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Full Name</th>
+                            <th>Admin</th>
+                            <th>Blocked</th>
+                            <th>Links</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in recent_users %}
+                            <tr>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.full_name or '-' }}</td>
+                                <td>
+                                    {% if user.is_admin %}
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-crown mr-1"></i> Admin
+                                        </span>
+                                    {% else %}
+                                        <span class="badge">
+                                            <i class="fas fa-user mr-1"></i> User
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.is_blocked %}
+                                        <span class="badge badge-danger">
+                                            <i class="fas fa-ban mr-1"></i> Blocked
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-check mr-1"></i> Active
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ user.link_count }}</td>
+                                <td class="text-sm text-gray-600">{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                                <td>
+                                    <a href="/admin/users?user={{ user.id }}" class="text-blue-600 hover:text-blue-800">
+                                        <i class="fas fa-edit"></i> Manage
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4 text-center">
+                <a href="/admin/users" class="btn btn-secondary">
+                    <i class="fas fa-arrow-right mr-2"></i> View All Users
+                </a>
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-users text-gray-400 text-4xl mb-4 block"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No users found</h3>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Recent Links Tab -->
+    <div id="links-tab" class="tab-content hidden">
+        {% if recent_links %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Slug</th>
+                            <th>Owner</th>
+                            <th>Original URL</th>
+                            <th>Visibility</th>
+                            <th>Hits</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for link in recent_links %}
+                            <tr>
+                                <td>
+                                    <code class="bg-gray-100 px-2 py-1 rounded text-sm font-mono">{{ link.slug }}</code>
+                                </td>
+                                <td>{{ link.owner_email }}</td>
+                                <td>
+                                    <a href="{{ link.original_url }}" target="_blank" class="text-blue-600 hover:text-blue-800 truncate" title="{{ link.original_url }}">
+                                        {{ link.original_url[:40] }}{% if link.original_url|length > 40 %}...{% endif %}
+                                    </a>
+                                </td>
+                                <td>
+                                    {% if link.is_public %}
+                                        <span class="badge badge-success">
+                                            <i class="fas fa-globe mr-1"></i> Public
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-warning">
+                                            <i class="fas fa-lock mr-1"></i> Private
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ link.hit_count }}</td>
+                                <td class="text-sm text-gray-600">{{ link.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-link text-gray-400 text-4xl mb-4 block"></i>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No links found</h3>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function switchTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.add('hidden');
+        });
+        
+        // Show selected tab
+        document.getElementById(tabName + '-tab').classList.remove('hidden');
+        
+        // Update tab buttons
+        document.querySelectorAll('button[onclick*="switchTab"]').forEach(btn => {
+            btn.classList.remove('text-gray-900', 'border-b-2', 'border-blue-600');
+            btn.classList.add('text-gray-600', 'hover:text-gray-900');
+        });
+        event.target.closest('button').classList.remove('text-gray-600', 'hover:text-gray-900');
+        event.target.closest('button').classList.add('text-gray-900', 'border-b-2', 'border-blue-600');
+    }
+</script>
+{% endblock %}
