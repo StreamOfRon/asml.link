@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./app:/app/app
+      - ./tests:/app/tests
+      - ./scripts:/app/scripts
+      - ./run.py:/app/run.py
+      - ./shortlink.db:/app/shortlink.db
+    env_file:
+      - .env
+    environment:
+      - DEBUG=true
+      - DATABASE_URL=sqlite+aiosqlite:///./shortlink.db
+    command: hypercorn app.main:app --reload --host 0.0.0.0 --port 5000
+    restart: unless-stopped
