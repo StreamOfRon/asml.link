@@ -8,10 +8,10 @@ Complete guide to configuring the Link Shortening Service for development and pr
 
 ```bash
 # SQLite (Development)
-DATABASE_URL=sqlite:///./shortlink.db
+DATABASE_URL=sqlite:///./asml-link.db
 
 # PostgreSQL (Production)
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/shortlink_db
+DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/asml_link_db
 ```
 
 **Notes:**
@@ -127,7 +127,7 @@ WORKERS=4                            # Number of worker processes
 **.env**
 ```bash
 # Database
-DATABASE_URL=sqlite:///./shortlink.db
+DATABASE_URL=sqlite:///./asml-link.db
 
 # OAuth (local)
 GOOGLE_CLIENT_ID=your-dev-client-id
@@ -162,7 +162,7 @@ SQLite database is persisted in the local directory.
 **.env.production**
 ```bash
 # Database (PostgreSQL)
-DATABASE_URL=postgresql+asyncpg://user:password@prod-db.example.com:5432/shortlink
+DATABASE_URL=postgresql+asyncpg://user:password@prod-db.example.com:5432/asml_link
 
 # OAuth (production URLs)
 GOOGLE_CLIENT_ID=prod-client-id
@@ -314,7 +314,7 @@ uv run pytest tests/test_integration_workflows.py -v
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_URL` | `sqlite:///./shortlink.db` | Database connection string |
+| `DATABASE_URL` | `sqlite:///./asml-link.db` | Database connection string |
 | `GOOGLE_CLIENT_ID` | None | Google OAuth Client ID |
 | `GOOGLE_CLIENT_SECRET` | None | Google OAuth Client Secret |
 | `GOOGLE_REDIRECT_URI` | None | Google OAuth redirect URI |
@@ -381,7 +381,7 @@ LIMITS = {
 **Solution:**
 SQLite has concurrent write limitations. For production with high concurrency, use PostgreSQL:
 ```bash
-DATABASE_URL=postgresql+asyncpg://user:password@db-server:5432/shortlink
+DATABASE_URL=postgresql+asyncpg://user:password@db-server:5432/asml_link
 ```
 
 ## Security Checklist

@@ -89,15 +89,15 @@ services:
     image: postgres:15-alpine
     container_name: link_shortener_db
     environment:
-      POSTGRES_DB: shortlink
-      POSTGRES_USER: shortlink_user
+      POSTGRES_DB: asml_link
+      POSTGRES_USER: asml_link_user
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
       - link_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U shortlink_user"]
+      test: ["CMD-SHELL", "pg_isready -U asml_link_user"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -106,7 +106,7 @@ services:
     image: yourusername/link-shortener:latest
     container_name: link_shortener_app
     environment:
-      DATABASE_URL: postgresql+asyncpg://shortlink_user:${DB_PASSWORD}@db:5432/shortlink
+      DATABASE_URL: postgresql+asyncpg://asml_link_user:${DB_PASSWORD}@db:5432/asml_link
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       GOOGLE_REDIRECT_URI: https://yourdomain.com/auth/callback/google
@@ -197,7 +197,7 @@ upstream app {
 server {
     listen 80;
     server_name yourdomain.com www.yourdomain.com;
-    
+
     # Redirect to HTTPS
     return 301 https://$server_name$request_uri;
 }
@@ -236,7 +236,7 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Connection "upgrade";
         proxy_set_header Upgrade $http_upgrade;
-        
+
         # Timeouts
         proxy_connect_timeout 60s;
         proxy_send_timeout 60s;
@@ -286,13 +286,13 @@ sudo apt-get install postgresql postgresql-contrib
 
 # Create database and user
 sudo -u postgres psql
-CREATE DATABASE shortlink;
-CREATE USER shortlink_user WITH PASSWORD 'strong_password';
-ALTER ROLE shortlink_user SET client_encoding TO 'utf8';
-ALTER ROLE shortlink_user SET default_transaction_isolation TO 'read committed';
-ALTER ROLE shortlink_user SET default_transaction_deferrable TO on;
-ALTER ROLE shortlink_user SET timezone TO 'UTC';
-GRANT ALL PRIVILEGES ON DATABASE shortlink TO shortlink_user;
+CREATE DATABASE asml_link;
+CREATE USER asml_link_user WITH PASSWORD 'strong_password';
+ALTER ROLE asml_link_user SET client_encoding TO 'utf8';
+ALTER ROLE asml_link_user SET default_transaction_isolation TO 'read committed';
+ALTER ROLE asml_link_user SET default_transaction_deferrable TO on;
+ALTER ROLE asml_link_user SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE asml_link TO asml_link_user;
 \q
 ```
 
@@ -300,10 +300,10 @@ GRANT ALL PRIVILEGES ON DATABASE shortlink TO shortlink_user;
 
 ```bash
 # Daily automated backup
-0 2 * * * pg_dump -U shortlink_user shortlink | gzip > /backups/shortlink_$(date +\%Y\%m\%d).sql.gz
+0 2 * * * pg_dump -U asml_link_user asml_link | gzip > /backups/asml_link_$(date +\%Y\%m\%d).sql.gz
 
 # Upload to cloud storage (AWS S3 example)
-0 3 * * * aws s3 cp /backups/ s3://your-bucket/shortlink-backups/ --recursive --exclude "*" --include "*.sql.gz"
+0 3 * * * aws s3 cp /backups/ s3://your-bucket/asml_link-backups/ --recursive --exclude "*" --include "*.sql.gz"
 ```
 
 ### Database Migrations
@@ -485,7 +485,7 @@ fly deploy
 docker-compose -f docker-compose.prod.yml ps
 
 # Check database connectivity
-docker-compose -f docker-compose.prod.yml exec db pg_isready -U shortlink_user
+docker-compose -f docker-compose.prod.yml exec db pg_isready -U asml_link_user
 ```
 
 ### Issue: SSL Certificate Error
@@ -523,7 +523,7 @@ Must exactly match `REDIRECT_URI` environment variable.
 docker-compose -f docker-compose.prod.yml logs -f app
 
 # Database stats
-docker-compose -f docker-compose.prod.yml exec db psql -U shortlink_user -d shortlink -c "SELECT * FROM pg_stat_statements LIMIT 10;"
+docker-compose -f docker-compose.prod.yml exec db psql -U asml_link_user -d asml_link -c "SELECT * FROM pg_stat_statements LIMIT 10;"
 
 # Container stats
 docker stats

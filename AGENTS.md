@@ -55,6 +55,12 @@ uv run dev
 docker-compose --build up
 ```
 
+### Continuous Integration
+
+- GitHub Actions PR checks use the `astral-sh/setup-uv@v1` action to install `uv`, select the Python version, and provide built-in caching for `uv` artifacts. The workflow is at `.github/workflows/pr-checks.yml`.
+- For local parity, run the same commands the workflow uses: `uv sync` then `uv run pytest` and `uv run lint`.
+
+
 ---
 
 ## Code Style Guidelines
