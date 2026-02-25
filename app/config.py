@@ -36,6 +36,20 @@ class Settings(BaseSettings):
     jwt_expiration_seconds: int = Field(default=3600)  # 1 hour
     refresh_token_expiration_days: int = Field(default=7)
 
+    # CSRF Protection
+    csrf_secret_key: str = Field(default="dev-csrf-secret-change-in-production")
+    csrf_token_expiration_minutes: int = Field(default=60)  # 1 hour
+
+    # Security Headers
+    enable_https_redirect: bool = Field(default=False)
+    enable_hsts: bool = Field(default=True)
+    hsts_max_age: int = Field(default=31536000)  # 1 year
+
+    # Session Security
+    session_secure_cookies: bool = Field(default=False)  # Set to True in production
+    session_httponly: bool = Field(default=True)
+    session_samesite: str = Field(default="Lax")  # Strict, Lax, or None
+
     # Application Settings
     instance_name: str = Field(default="My Short Links")
     allow_private_links_only: bool = Field(default=False)

@@ -8,6 +8,11 @@ from quart import Quart, jsonify
 
 from app.config import settings
 from app.models import init_db, close_db
+from app.middleware import (
+    setup_error_handlers,
+    setup_request_logging,
+    setup_security_headers_middleware,
+)
 
 
 async def create_app() -> Quart:
@@ -20,6 +25,10 @@ async def create_app() -> Quart:
 
     # Configuration
     app.config["JSON_SORT_KEYS"] = False
+    app.config["SESSION_COOKIE_SECURE"] = settings.session_secure_cookies
+    app.config["SESSION_COOKIE_HTTPONLY"] = settings.session_httponly
+    app.config["SESSION_COOKIE_SAMESITE"] = settings.session_samesite
+    app.secret_key = settings.csrf_secret_key
 
     # Startup and shutdown handlers
     @app.before_serving
@@ -32,17 +41,10 @@ async def create_app() -> Quart:
         """Close database connections on shutdown."""
         await close_db()
 
-    # Error handlers
-    @app.errorhandler(404)
-    async def handle_404(error) -> tuple[dict, int]:
-        """Handle 404 Not Found errors."""
-        return jsonify({"error": "Not found", "message": str(error)}), 404
-
-    @app.errorhandler(500)
-    async def handle_500(error) -> tuple[dict, int]:
-        """Handle 500 Internal Server Error."""
-        app.logger.error(f"Internal server error: {error}")
-        return jsonify({"error": "Internal server error"}), 500
+    # Setup global error handlers and middleware
+    await setup_error_handlers(app)
+    await setup_request_logging(app)
+    await setup_security_headers_middleware(app)
 
     # Register blueprints
     from app.routes import (
