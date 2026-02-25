@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for development and production
 
 # Development stage
-FROM python:3.10-slim as development
+FROM python:3.13-slim as development
 
 WORKDIR /app
 
@@ -26,7 +26,7 @@ EXPOSE 5000
 CMD ["uv", "run", "hypercorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "5000"]
 
 # Production stage
-FROM python:3.10-slim as production
+FROM python:3.13-slim as production
 
 WORKDIR /app
 
