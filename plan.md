@@ -1,5 +1,49 @@
 # Python Link Shortening Application - Implementation Plan
 
+## Completion Status
+
+### ✅ Phase 1: Core Infrastructure & Data Models
+- ✅ Project setup with UV package manager
+- ✅ Configuration management (`config.py`)
+- ✅ SQLAlchemy ORM models (User, Link, OAuthAccount, AllowListEntry)
+- ✅ Utilities: Slug generator, validators
+- ✅ Custom exception hierarchy
+- ✅ Alembic database migration setup
+- ✅ Docker multi-stage build and docker-compose configuration
+- ✅ Pre-commit hooks (ruff, black, mypy)
+- ✅ Development scripts (dev.sh, test.sh, lint.sh, format.sh)
+
+### ✅ Phase 2: Unit Tests & Service Layer
+- ✅ Test infrastructure (pytest fixtures with fresh in-memory SQLite per test)
+- ✅ Utilities tests (27 tests):
+  - Slug generation tests (13 tests)
+  - Validator tests (14 tests)
+- ✅ ORM Model tests (54 tests):
+  - Link model tests (14 tests)
+  - User model tests (19 tests)
+  - OAuth account tests (18 tests)
+  - Access control tests (16 tests)
+- ✅ Service layer implementation & tests (16 tests):
+  - LinkService (create, read, update, delete, access control, slug validation)
+  - UserService (CRUD, admin operations, blocking)
+  - AuthService (OAuth linking, provider lookups, token management)
+- **Total: 110 tests passing** ✅
+
+### 🔄 Phase 3: Database Integration Setup (IN PROGRESS)
+- [ ] Connection pooling configuration
+- [ ] Async context management
+- [ ] Dependency injection setup
+
+### ⏳ Phase 4: Authentication Implementation
+- [ ] JWT token generation/validation
+- [ ] OAuth2 flows for configured providers
+- [ ] Token refresh and revocation
+
+### ⏳ Phase 5-13: Feature Implementation
+- [ ] API endpoints, admin dashboard, web UI, security, integration tests, deployment
+
+---
+
 ## Project Overview
 
 A Python-based link shortening service built with **Quart** async framework, featuring OAuth2 authentication, flexible access control, and comprehensive admin capabilities. The application supports both a REST API and web UI for managing shortened URLs with usage statistics.
@@ -98,9 +142,9 @@ shortlink-app/
 
 ---
 
-## Phase 1: Core Infrastructure & Authentication
+## Phase 1: Core Infrastructure & Data Models (✅ COMPLETED)
 
-### 1.1 Project Setup
+### 1.1 Project Setup (✅ COMPLETED)
 - [ ] Initialize project structure with proper Python packaging
 - [ ] Set up UV project management:
   - Create `pyproject.toml` with project metadata and dependencies
@@ -139,7 +183,7 @@ shortlink-app/
   - Instance settings (allow private links only, allow-list mode, etc.)
   - Session/token expiration times
 
-### 1.2 Database Layer
+### 1.2 Database Layer (✅ COMPLETED)
 - [ ] Create SQLAlchemy models:
   - **User**: id, email, full_name, avatar_url, is_admin, is_blocked, created_at, updated_at
   - **Link**: id, user_id, original_url, slug, is_public, allowed_emails, created_at, updated_at, hit_count, last_hit_at
@@ -150,7 +194,7 @@ shortlink-app/
 - [ ] Implement database initialization (with first user setup as admin)
 - [ ] Add database utilities for common operations
 
-### 1.3 OAuth2 Authentication
+### 1.3 OAuth2 Authentication (⏳ Phase 4)
 - [ ] Implement OAuth2 provider abstraction:
   - Support multiple configurable providers (Google, GitHub, Microsoft, etc.)
   - Dynamic provider registration from configuration
@@ -170,321 +214,286 @@ shortlink-app/
 
 ---
 
-## Phase 2: Link Management - Core Features
+## Phase 2: Unit Tests & Service Layer (✅ COMPLETED)
 
-### 2.1 Link Creation & Management
-- [ ] Implement link service:
-  - Create shortened link with random slug (Base62)
-  - Create shortened link with custom slug (with validation)
-  - Slug uniqueness validation
+### 2.1 Test Infrastructure (✅ COMPLETED)
+- ✅ Pytest setup with asyncio support
+- ✅ Fixtures for fresh in-memory SQLite database per test (prevents UNIQUE constraint conflicts)
+- ✅ Test user, link, and admin fixtures
+- ✅ Test database initialization
+
+### 2.2 Utilities Tests (✅ COMPLETED - 27 tests)
+- ✅ Slug generation tests (13 tests):
+  - Random slug generation with default/custom lengths
+  - Base62 character validation
+  - Randomness and uniqueness verification
+  - Length validation and error handling
+- ✅ Validator tests (14 tests):
+  - URL validation (protocol, domain, max length)
+  - Email validation and normalization
+  - Full name validation
+  - Edge cases and error handling
+
+### 2.3 ORM Model Tests (✅ COMPLETED - 54 tests)
+- ✅ Link model tests (14 tests):
+  - Model creation and persistence
+  - Relationships (owner, allowed emails)
+  - Timestamps and auto-generation
+  - Hit count tracking
+- ✅ User model tests (19 tests):
+  - User creation and CRUD operations
+  - Cascade deletion (links deleted when user deleted)
+  - Admin and blocked status management
+  - Email normalization on save
+- ✅ OAuth account tests (18 tests):
+  - OAuth account creation and linking
+  - Provider credential storage
+  - Multiple OAuth accounts per user
+  - User creation from OAuth providers
+- ✅ Access control tests (16 tests):
+  - Public link access
+  - Private link access restrictions
+  - Email allowlist enforcement
+  - Admin and blocked user status effects
+
+### 2.4 Service Layer Implementation (✅ COMPLETED - 16 tests)
+- ✅ LinkService:
+  - Create links with random/custom slugs
+  - Slug uniqueness and validation (Base62 only)
   - Original URL validation
-  - Enforce private-only mode (if configured)
-- [ ] Create link routes (API + Web):
-  - `POST /api/links` - Create new link (requires auth)
-  - `GET /api/links` - List user's links (requires auth)
-  - `GET /api/links/<id>` - Get link details (requires auth + ownership)
-  - `PATCH /api/links/<id>` - Update link (requires auth + ownership)
-  - `DELETE /api/links/<id>` - Delete link (requires auth + ownership)
-  - `POST /links/create` - Web form for link creation (GET + POST)
-- [ ] Implement access control decorator/middleware
-
-### 2.2 Link Redirect Logic
-- [ ] Create redirect route: `GET /<slug>` 
-- [ ] Implement access control for private links:
-  - Unauthenticated users → 401 with login option
-  - Authenticated but unauthorized → 403 with explanation
-  - Check allow-list mode for global access control
-  - Check per-link email whitelist if applicable
-- [ ] Implement statistics tracking:
-  - Increment hit count
-  - Update last_hit_at timestamp
-- [ ] Implement proper redirect responses (301/302)
-
-### 2.3 User Dashboard
-- [ ] Create user dashboard route and template
-- [ ] Display user's shortened links with:
-  - Original URL, slug, creation date
-  - Public/Private status
-  - Hit count and last hit time
-  - Quick edit/delete buttons
-- [ ] Link management UI:
-  - Create new link form
-  - Edit link (URL, slug, access level, allowed emails)
-  - Delete link with confirmation
-  - Copy slug to clipboard
+  - Access control checking (public/private/allowlist)
+  - Update and delete with ownership verification
+  - Hit count incrementing
+  - CRUD queries
+- ✅ UserService:
+  - User creation and profile updates
+  - Admin promotion/demotion
+  - User blocking/unblocking
+  - Cascade deletion
+  - User queries (by email, admin list, blocked list, with links)
+- ✅ AuthService:
+  - OAuth account creation and linking
+  - User creation from OAuth providers
+  - Provider credential lookups and updates
+  - Account unlinking
 
 ---
 
-## Phase 3: Access Control & Permissions
+## Phase 3: Database Integration Setup (⏳ IN PROGRESS)
 
-### 3.1 Link Access Control
-- [ ] Implement permission checking service:
-  - Check link is public (anyone can access)
-  - Check user is authenticated for private links
-  - Check user email in allow-list (if set)
-- [ ] Update redirect logic with comprehensive access control
-- [ ] Error page templates for 401/403 with login option
+### 3.1 Connection Pooling
+- [ ] Implement async connection pool for PostgreSQL support
+- [ ] Configure pool size, overflow, and timeout settings
+- [ ] Add health check mechanism for stale connections
 
-### 3.2 User Management
-- [ ] Implement user service for admin operations:
-  - Fetch user list
-  - Mark user as admin
-  - Block/unblock user
-  - Delete user (cascade delete user's links)
-- [ ] Create user management routes (admin only):
-  - `GET /api/users` - List all users (admin only)
-  - `PATCH /api/users/<id>/admin` - Toggle admin status (admin only)
-  - `PATCH /api/users/<id>/block` - Toggle blocked status (admin only)
-  - `DELETE /api/users/<id>` - Delete user (admin only)
+### 3.2 Async Context Management
+- [ ] Create database session factory
+- [ ] Implement async context manager for database transactions
+- [ ] Set up request-scoped session management for Quart
+
+### 3.3 Dependency Injection
+- [ ] Create dependency injection container for services
+- [ ] Wire services with database sessions
+- [ ] Set up factory pattern for service creation
 
 ---
 
-## Phase 4: Admin Dashboard & Features
+## Phase 4: Authentication Implementation
 
-### 4.1 Admin Dashboard Routes
-- [ ] Create admin routes (admin-only middleware):
-  - `GET /admin/` - Admin dashboard (overview stats)
-  - `GET /admin/links` - View all links in system
-  - `GET /admin/users` - View all users
+### 4.1 JWT Token Management
+- [ ] Implement JWT token generation with user claims
+- [ ] Implement JWT token validation middleware
+- [ ] Add token refresh token mechanism
+- [ ] Implement token revocation/blacklisting
 
-### 4.2 Admin Dashboard UI
-- [ ] Admin dashboard template showing:
-  - System statistics (total links, total users, total hits)
-  - Recent activity
-  - Quick actions
-- [ ] Admin links page:
-  - Table of all links with user, original URL, slug, hit count
-  - Edit/delete buttons for any link
-  - Filter/search capabilities
-- [ ] Admin users page:
-  - Table of all users with email, creation date, admin status, blocked status
-  - Buttons to toggle admin/blocked status
-  - Delete user option
+### 4.2 OAuth2 Provider Integration
+- [ ] Create OAuth2 provider abstraction layer
+- [ ] Implement Google OAuth2 flow
+- [ ] Implement GitHub OAuth2 flow
+- [ ] Add configurable provider support
+- [ ] Implement OAuth callback handling
 
-### 4.3 Instance Configuration Features
-- [ ] Implement configuration options (via `.env`):
-  - `REQUIRE_PRIVATE_LINKS_ONLY` - Force all links to be private
-  - `ENABLE_ALLOW_LIST_MODE` - Only allow-listed emails can authenticate (enable/disable only via config)
-- [ ] Create configuration validation on startup
-- [ ] Create AllowListEntry model for database storage:
-  - Store allowed emails for allow-list mode
-  - Allow admin to add/remove emails at runtime
-- [ ] Implement allow-list management routes (admin only):
-  - `GET /api/admin/allow-list` - List allowed emails
-  - `POST /api/admin/allow-list` - Add email to allow-list
-  - `DELETE /api/admin/allow-list/<email>` - Remove email from allow-list
-- [ ] Create allow-list management UI in admin dashboard:
-  - Display current allowed emails
-  - Form to add new emails
-  - Delete buttons for existing entries
-- [ ] Update auth service to check allow-list from database (if mode enabled)
-- [ ] Add allow-list display in admin dashboard
-
----
-
-## Phase 5: Statistics & Analytics
-
-### 5.1 Statistics Service
-- [ ] Implement statistics collection:
-  - Track hit count per link
-  - Track last hit timestamp per link
-  - (Optional future: hourly/daily hit breakdown, geographic data, referrer tracking)
-- [ ] Create statistics retrieval methods:
-  - Get link statistics
-  - Get user statistics (all their links' hits)
-  - Get system statistics (admin only)
-
-### 5.2 Statistics UI
-- [ ] Display on user dashboard:
-  - Hit count and last hit time per link
-  - Total hits across all user's links
-- [ ] Display on admin dashboard:
-  - System-wide hit statistics
-  - Top links
-  - User activity trends
-
----
-
-## Phase 6: Web UI & Templates
-
-### 6.1 Base Layout & Navigation
-- [ ] Create `base.html` template with:
-  - Navigation bar with user info/logout
-  - Login prompt for unauthenticated users
-  - Responsive design
-  - Error/success message area
-- [ ] Create consistent styling (CSS framework or custom)
-
-### 6.2 Authentication Pages
-- [ ] Login page (`login.html`):
-  - Display available OAuth providers dynamically
-  - Provider buttons with icons
-  - Redirect from unauthorized page (with return_to parameter)
-- [ ] Create styled OAuth provider buttons
-
-### 6.3 User-Facing Pages
-- [ ] Dashboard (`dashboard.html`):
-  - User's links list table
-  - Create new link form/modal
-  - Link statistics display
-  - Edit/delete UI
-- [ ] Link detail page (`link_detail.html`):
-  - Show original URL and slug
-  - Display QR code for shortened URL
-  - Show access statistics
-  - Edit form
-
-### 6.4 Admin Pages
-- [ ] Admin links page (`admin/links.html`):
-  - Table of all system links
-  - Search/filter functionality
-  - Edit/delete buttons
-- [ ] Admin users page (`admin/users.html`):
-  - Table of all users
-  - Admin/blocked status toggles
-  - Delete user option
-- [ ] Admin dashboard (`admin/dashboard.html`):
-  - System overview statistics
-  - Recent activity feed
-  - Configuration display
-
-### 6.5 Error Pages
-- [ ] Create custom error templates:
-  - `401.html` (Unauthenticated - with login button)
-  - `403.html` (Forbidden - with explanation)
-  - `404.html` (Not found)
-  - `500.html` (Server error)
-
----
-
-## Phase 7: API Development & REST Endpoints
-
-### 7.1 Authentication API
+### 4.3 Authentication Routes
 - [ ] `GET /auth/login/<provider>` - Start OAuth flow
 - [ ] `GET /auth/callback/<provider>` - OAuth callback
-- [ ] `POST /auth/logout` - Logout
+- [ ] `POST /auth/logout` - Logout and revoke tokens
 - [ ] `GET /auth/me` - Get current user info
 - [ ] `POST /auth/refresh` - Refresh JWT token
 
-### 7.2 Links API
-- [ ] `POST /api/links` - Create link
-  - Body: `{original_url, slug?, is_public?, allowed_emails?}`
-  - Returns: full link object
-- [ ] `GET /api/links` - List user's links (paginated)
-- [ ] `GET /api/links/<id>` - Get link details
-- [ ] `PATCH /api/links/<id>` - Update link
-  - Can update: original_url, slug, is_public, allowed_emails
-- [ ] `DELETE /api/links/<id>` - Delete link
+---
 
-### 7.3 Users API (Admin)
-- [ ] `GET /api/users` - List all users (paginated, admin only)
-- [ ] `GET /api/users/<id>` - Get user details (admin only)
-- [ ] `PATCH /api/users/<id>/admin` - Toggle admin status (admin only)
-- [ ] `PATCH /api/users/<id>/block` - Toggle blocked status (admin only)
-- [ ] `DELETE /api/users/<id>` - Delete user (admin only)
+## Phase 5: Link Management API Endpoints
 
-### 7.4 Allow-List Management API (Admin)
-- [ ] `GET /api/admin/allow-list` - List allowed emails (admin only)
-- [ ] `POST /api/admin/allow-list` - Add email to allow-list (admin only)
-  - Body: `{email}`
-- [ ] `DELETE /api/admin/allow-list/<email>` - Remove email from allow-list (admin only)
+### 5.1 Link Creation & Management
+- [ ] `POST /api/links` - Create new link (requires auth)
+- [ ] `GET /api/links` - List user's links (requires auth, paginated)
+- [ ] `GET /api/links/<id>` - Get link details (requires auth + ownership)
+- [ ] `PATCH /api/links/<id>` - Update link (requires auth + ownership)
+- [ ] `DELETE /api/links/<id>` - Delete link (requires auth + ownership)
 
-### 7.5 Statistics API
-- [ ] `GET /api/links/<id>/stats` - Get link statistics (owner or admin)
-- [ ] `GET /api/stats/user` - Get user's overall statistics
-- [ ] `GET /api/stats/system` - Get system statistics (admin only)
-
-### 7.6 Admin API
-- [ ] `GET /api/admin/dashboard` - Get dashboard data (admin only)
-- [ ] `GET /api/admin/config` - Get instance configuration (admin only)
+### 5.2 Link Request/Response Validation
+- [ ] Create Pydantic schemas for link requests and responses
+- [ ] Implement request validation middleware
+- [ ] Implement consistent error response formatting
 
 ---
 
-## Phase 8: Security & Error Handling
+## Phase 6: Link Redirect Logic & Access Control
 
-### 8.1 Security Measures
-- [ ] Implement JWT validation middleware
-- [ ] Implement admin-only route protection
-- [ ] Implement ownership checks for link operations
+### 6.1 Link Redirect Endpoint
+- [ ] `GET /<slug>` - Redirect to original URL
+- [ ] Implement public link redirect (anyone can access)
+- [ ] Implement private link access control:
+  - Unauthenticated users → 401 with login option
+  - Authenticated but unauthorized → 403
+  - Email allowlist checking
+- [ ] Implement hit count tracking on redirect
+- [ ] Return proper redirect responses (301/302)
+
+### 6.2 Access Control Middleware
+- [ ] Create permission checking decorator
+- [ ] Implement ownership verification
+- [ ] Implement admin-only access checks
+
+---
+
+## Phase 7: User Management API Endpoints
+
+### 7.1 User Management Routes (Admin Only)
+- [ ] `GET /api/users` - List all users (paginated)
+- [ ] `GET /api/users/<id>` - Get user details
+- [ ] `PATCH /api/users/<id>/admin` - Toggle admin status
+- [ ] `PATCH /api/users/<id>/block` - Toggle blocked status
+- [ ] `DELETE /api/users/<id>` - Delete user
+
+### 7.2 Admin Allow-List Management API
+- [ ] `GET /api/admin/allow-list` - List allowed emails
+- [ ] `POST /api/admin/allow-list` - Add email to allow-list
+- [ ] `DELETE /api/admin/allow-list/<email>` - Remove email from allow-list
+
+---
+
+## Phase 8: Admin Dashboard Backend & User Dashboard Backend
+
+### 8.1 Admin Dashboard API Endpoints
+- [ ] `GET /api/admin/dashboard` - Dashboard statistics and overview
+- [ ] `GET /api/admin/config` - Instance configuration display
+- [ ] System statistics (total links, users, hits)
+- [ ] Recent activity tracking
+
+### 8.2 User Dashboard API Endpoints
+- [ ] User profile information
+- [ ] User's link list with statistics
+- [ ] Statistics aggregation (total hits, recent activity)
+
+---
+
+## Phase 9: Web UI & Templates
+
+### 9.1 Base Layout & Navigation
+- [ ] Create `base.html` with navigation, responsive design
+- [ ] Implement consistent styling (CSS framework or custom)
+
+### 9.2 Authentication Pages
+- [ ] Create `login.html` with dynamic OAuth provider buttons
+- [ ] Create logout functionality
+
+### 9.3 User Dashboard UI
+- [ ] Create `dashboard.html` with user's links table
+- [ ] Link creation form/modal
+- [ ] Link statistics display
+- [ ] Link edit/delete UI
+- [ ] Copy-to-clipboard for slugs
+
+### 9.4 Link Detail Page
+- [ ] Create `link_detail.html`
+- [ ] Display original URL and slug
+- [ ] QR code generation for shortened URL
+- [ ] Access statistics display
+- [ ] Edit form
+
+### 9.5 Admin Dashboard UI
+- [ ] Admin dashboard page (`admin/dashboard.html`)
+- [ ] Admin links management page (`admin/links.html`)
+- [ ] Admin users management page (`admin/users.html`)
+- [ ] Allow-list management UI
+
+### 9.6 Error Pages
+- [ ] `401.html` (Unauthenticated)
+- [ ] `403.html` (Forbidden)
+- [ ] `404.html` (Not found)
+- [ ] `500.html` (Server error)
+
+---
+
+## Phase 10: Advanced Features
+
+### 10.1 Statistics & Analytics
+- [ ] Implement per-link hit count tracking
+- [ ] Implement per-user aggregated statistics
+- [ ] Implement system-wide statistics
+- [ ] (Optional: hourly/daily breakdown, geographic data, referrer tracking)
+
+### 10.2 Rate Limiting
+- [ ] Implement rate limiting on OAuth login attempts
+- [ ] Implement rate limiting on link creation (per user)
+- [ ] Implement rate limiting on link redirects (per link)
+
+### 10.3 Custom Domain Support (Future)
+- [ ] Allow admins to configure custom domains
+- [ ] Route custom domain requests to shortened links
+
+---
+
+## Phase 11: Security Hardening & Error Handling
+
+### 11.1 Security Measures
 - [ ] Implement CSRF protection for web forms
-- [ ] Implement rate limiting on:
-  - OAuth login attempts
-  - Link creation (per user)
-  - Link redirects (optional, per link)
-- [ ] Input validation on all user inputs:
-  - URL validation
-  - Email validation
-  - Slug format validation
-- [ ] Secure password/token storage best practices
+- [ ] Implement security headers (HSTS, CSP, X-Frame-Options)
+- [ ] Implement input sanitization
+- [ ] Secure token storage best practices
 
-### 8.2 Error Handling
+### 11.2 Global Error Handling
 - [ ] Create global error handler middleware
-- [ ] Implement custom exception classes:
-  - `UnauthorizedError` (401)
-  - `ForbiddenError` (403)
-  - `NotFoundError` (404)
-  - `ValidationError` (422)
-  - `ConflictError` (409, e.g., slug exists)
-- [ ] Return consistent error responses (JSON for API, HTML for web)
-- [ ] Log errors appropriately
+- [ ] Implement consistent error response formatting
+- [ ] Implement proper HTTP status codes
+- [ ] Add structured error logging
 
 ---
 
-## Phase 9: Testing
+## Phase 12: Integration Tests & End-to-End Tests
 
-### 9.1 Unit Tests
-- [ ] Test slug generation (randomness, uniqueness, format)
-- [ ] Test link service (CRUD operations, validation)
-- [ ] Test authentication service (token generation, validation)
-- [ ] Test user service (admin operations)
-- [ ] Test access control logic
-
-### 9.2 Integration Tests
-- [ ] Test OAuth flow (with mocked OAuth provider)
+### 12.1 Integration Tests
+- [ ] Test OAuth flow with mocked OAuth provider
 - [ ] Test link creation and redirect flow
 - [ ] Test private link access control
 - [ ] Test admin operations
-- [ ] Test API endpoints
 
-### 9.3 End-to-End Tests
+### 12.2 End-to-End Tests
 - [ ] Test complete user workflows (signup → create link → redirect)
-- [ ] Test admin workflows (user management, link management)
+- [ ] Test admin workflows (user management, link management, allow-list management)
 
 ---
 
-## Phase 10: Documentation & Deployment
+## Phase 13: Documentation & Deployment Preparation
 
-### 10.1 Documentation
-- [ ] Create `README.md` with:
+### 13.1 Documentation
+- [ ] Update `README.md` with:
   - Project overview
   - Installation instructions
-  - Configuration guide (environment variables)
-  - OAuth provider setup guide
+  - Configuration guide
+  - OAuth provider setup
   - Development workflow
   - Running the application
 - [ ] Create API documentation (OpenAPI/Swagger)
-- [ ] Create configuration template with comments
 
-### 10.2 Deployment Preparation
-- [ ] Create Docker setup:
-  - Multi-stage `Dockerfile`:
-    - Development stage with hot-reload capability via code volume mounts
-    - Production stage with optimized image size and dependencies
-  - `docker-compose.yaml` for local development (app service only):
-    - SQLite database as default for development
-    - Volume mounts for code hot-reload
-  - `.dockerignore` for efficient builds
-- [ ] Document Docker development workflow in README:
-  - Quick start: `docker-compose --build up`
-  - SQLite database location: `./shortlink.db` (created automatically)
-  - How to access application: `http://localhost:5000`
-  - How to run commands inside container
-- [ ] Create production configuration recommendations:
-  - Environment variable requirements
-  - Database setup for production (PostgreSQL recommended)
-  - Reverse proxy configuration (nginx/caddy)
-  - SSL/TLS certificate setup
-  - Rate limiting and security headers
+### 13.2 Deployment Setup
+- [ ] Docker Compose for production
+- [ ] PostgreSQL database setup guide
+- [ ] Environment variable reference
+- [ ] Deployment checklist
+
+
 
 ---
 
@@ -614,16 +623,19 @@ PORT=5000
 
 ## Implementation Order Recommendation
 
-1. **Phase 1** - Set up project structure, database, and OAuth authentication
-2. **Phase 2** - Implement core link management (CRUD operations)
-3. **Phase 3** - Add access control and link redirect logic
-4. **Phase 4** - Build admin dashboard and user management
-5. **Phase 5** - Implement statistics tracking
-6. **Phase 6** - Develop web UI and templates
-7. **Phase 7** - Flesh out complete REST API
-8. **Phase 8** - Add security measures and error handling
-9. **Phase 9** - Write comprehensive test suite
-10. **Phase 10** - Documentation and deployment preparation
+1. **Phase 1** - Set up project structure, database models, utilities, and custom exceptions
+2. **Phase 2** - Unit tests: Data models, validators, slug generation, service logic (TDD)
+3. **Phase 3** - Database integration setup (connection pooling, migrations, async context)
+4. **Phase 4** - Authentication (JWT token generation/validation, OAuth2 flows)
+5. **Phase 5** - Link Management API endpoints (CRUD operations)
+6. **Phase 6** - Link Redirect Logic & Access Control
+7. **Phase 7** - User Management API endpoints (admin operations)
+8. **Phase 8** - Admin Dashboard Backend & User-Facing Dashboard Backend
+9. **Phase 9** - Web UI & Templates (HTML/CSS/JavaScript)
+10. **Phase 10** - Advanced Features (rate limiting, analytics, custom domains)
+11. **Phase 11** - Security Hardening & Error Handling
+12. **Phase 12** - Integration Tests & End-to-End Tests
+13. **Phase 13** - Documentation & Deployment Preparation
 
 ---
 
