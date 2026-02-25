@@ -3,9 +3,9 @@
 from datetime import datetime
 from typing import AsyncGenerator
 
-from sqlalchemy import Column, DateTime, Integer, func
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker, Mapped, mapped_column
 
 from app.config import settings
 
@@ -31,12 +31,10 @@ class BaseModel(Base):
     """Base model with common fields for all models."""
 
     __abstract__ = True
-    __allow_unmapped__ = True
 
-    id: int = Column(Integer, primary_key=True)
-    created_at: datetime = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at: datetime = Column(
-        DateTime,
+    id: Mapped[int] = mapped_column(primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
         default=datetime.utcnow,
         onupdate=datetime.utcnow,
         nullable=False,

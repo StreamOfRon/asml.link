@@ -1,7 +1,8 @@
 """User model."""
 
-from sqlalchemy import String, Boolean, Column
-from sqlalchemy.orm import relationship
+from typing import List
+from sqlalchemy import String, Boolean
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from app.models import BaseModel
 
@@ -10,17 +11,18 @@ class User(BaseModel):
     """User model for authentication and link management."""
 
     __tablename__ = "users"
-    __allow_unmapped__ = True
 
-    email: str = Column(String(255), unique=True, nullable=False, index=True)
-    full_name: str = Column(String(255), nullable=True)
-    avatar_url: str = Column(String(512), nullable=True)
-    is_admin: bool = Column(Boolean, default=False, nullable=False)
-    is_blocked: bool = Column(Boolean, default=False, nullable=False)
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    full_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(String(512), nullable=True)
+    is_admin: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    is_blocked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
     # Relationships
-    links = relationship("Link", back_populates="user", cascade="all, delete-orphan")
-    oauth_accounts = relationship(
+    links: Mapped[List["Link"]] = relationship(
+        "Link", back_populates="user", cascade="all, delete-orphan"
+    )
+    oauth_accounts: Mapped[List["OAuthAccount"]] = relationship(
         "OAuthAccount", back_populates="user", cascade="all, delete-orphan"
     )
 
