@@ -2,8 +2,7 @@
 
 import pytest
 
-from app.utils.oauth import OAuthProvider, OAuthManager, OAuthUserInfo, oauth_manager
-from app.config import settings
+from app.utils.oauth import OAuthManager, OAuthProvider, OAuthUserInfo, oauth_manager
 
 
 class TestOAuthUserInfo:

@@ -5,7 +5,7 @@ for user authentication and session management.
 """
 
 from datetime import datetime, timedelta, timezone
-from typing import Optional, Dict, Any
+from typing import Any, Dict, Optional
 
 import jwt
 

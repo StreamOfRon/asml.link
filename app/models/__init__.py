@@ -3,9 +3,9 @@
 from datetime import datetime
 from typing import AsyncGenerator
 
-from sqlalchemy import func, pool
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, AsyncEngine
-from sqlalchemy.orm import declarative_base, sessionmaker, Mapped, mapped_column
+from sqlalchemy import pool
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
+from sqlalchemy.orm import Mapped, declarative_base, mapped_column, sessionmaker
 
 from app.config import settings
 

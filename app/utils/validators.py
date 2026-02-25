@@ -1,8 +1,8 @@
 """Input validation utilities."""
 
 import re
-from urllib.parse import urlparse
 from typing import Optional
+from urllib.parse import urlparse
 
 
 def is_valid_url(url: str, max_length: int = 2048) -> bool:

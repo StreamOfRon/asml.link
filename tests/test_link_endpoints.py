@@ -1,11 +1,10 @@
 """Integration tests for link API endpoints."""
 
-import json
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.user import User
 from app.models.link import Link
+from app.models.user import User
 from app.services.link_service import LinkService
 
 

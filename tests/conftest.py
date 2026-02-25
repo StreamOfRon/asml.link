@@ -1,18 +1,17 @@
 """Pytest configuration and shared fixtures."""
 
 import asyncio
-import os
 from typing import AsyncGenerator
 
 import pytest
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
+from app.config import settings as app_settings
 from app.models import Base
-from app.models.user import User
 from app.models.link import Link
 from app.models.oauth_account import OAuthAccount
-from app.config import settings as app_settings
+from app.models.user import User
 
 
 @pytest.fixture(scope="session")

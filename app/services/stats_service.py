@@ -1,12 +1,12 @@
 """Statistics service for dashboard functionality."""
 
-from datetime import datetime, timedelta, UTC
-from sqlalchemy import select, func
+from datetime import UTC, datetime, timedelta
+
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.user import User
 from app.models.link import Link
-from app.config import settings
+from app.models.user import User
 
 
 class StatsService:
@@ -70,7 +70,7 @@ class StatsService:
             Admin user count
         """
         result = await self.session.execute(
-            select(func.count(User.id)).where(User.is_admin == True)
+            select(func.count(User.id)).where(User.is_admin.is_(True))
         )
         return result.scalar() or 0
 
@@ -81,7 +81,7 @@ class StatsService:
             Blocked user count
         """
         result = await self.session.execute(
-            select(func.count(User.id)).where(User.is_blocked == True)
+            select(func.count(User.id)).where(User.is_blocked.is_(True))
         )
         return result.scalar() or 0
 
@@ -92,7 +92,7 @@ class StatsService:
             Count of public links
         """
         result = await self.session.execute(
-            select(func.count(Link.id)).where(Link.is_public == True)
+            select(func.count(Link.id)).where(Link.is_public.is_(True))
         )
         return result.scalar() or 0
 
@@ -103,7 +103,7 @@ class StatsService:
             Count of private links
         """
         result = await self.session.execute(
-            select(func.count(Link.id)).where(Link.is_public == False)
+            select(func.count(Link.id)).where(Link.is_public.is_(False))
         )
         return result.scalar() or 0
 
@@ -189,7 +189,7 @@ class StatsService:
             Count of user's public links
         """
         result = await self.session.execute(
-            select(func.count(Link.id)).where(Link.user_id == user_id, Link.is_public == True)
+            select(func.count(Link.id)).where(Link.user_id == user_id, Link.is_public.is_(True))
         )
         return result.scalar() or 0
 
@@ -203,7 +203,7 @@ class StatsService:
             Count of user's private links
         """
         result = await self.session.execute(
-            select(func.count(Link.id)).where(Link.user_id == user_id, Link.is_public == False)
+            select(func.count(Link.id)).where(Link.user_id == user_id, Link.is_public.is_(False))
         )
         return result.scalar() or 0
 

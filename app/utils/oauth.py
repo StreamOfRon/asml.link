@@ -4,8 +4,8 @@ This module provides utilities for OAuth2 provider integration,
 including client setup and user info retrieval.
 """
 
-from typing import Optional, Dict, Any
 from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
 import aiohttp
 

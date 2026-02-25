@@ -29,17 +29,18 @@ class TestUserManagementEndpoints:
     ):
         """Test that only admins can list users."""
         from sqlalchemy import select
+
         from app.models.user import User as UserModel
 
         service = UserService(db_session)
 
         # Create multiple users
-        user2 = await service.create_user(
+        _user2 = await service.create_user(
             email="user2@example.com",
             full_name="User 2",
         )
 
-        user3 = await service.create_user(
+        _user3 = await service.create_user(
             email="user3@example.com",
             full_name="User 3",
         )

@@ -3,17 +3,17 @@
 from typing import Optional
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.user import User
-from app.models.oauth_account import OAuthAccount
-from app.utils.validators import is_valid_email, normalize_email
 from app.exceptions import (
-    ValidationError,
-    NotFoundError,
     ConflictError,
+    NotFoundError,
+    ValidationError,
 )
+from app.models.oauth_account import OAuthAccount
+from app.models.user import User
+from app.utils.validators import is_valid_email, normalize_email
 
 
 class AuthService:

@@ -1,11 +1,11 @@
 """User management API route handlers (admin only)."""
 
-from quart import Blueprint, jsonify, request, current_app
+from quart import Blueprint, current_app, jsonify, request
 
+from app.exceptions import NotFoundError
 from app.models import get_db
+from app.schemas.user import UserListResponse, UserResponse
 from app.services.user_service import UserService
-from app.schemas.user import UserResponse, UserListResponse, UserUpdateRequest
-from app.exceptions import NotFoundError, ValidationError, AppException
 
 # Create blueprint
 users_bp = Blueprint("users", __name__, url_prefix="/api/users")
@@ -76,9 +76,7 @@ async def list_users():
             return jsonify({"error": "Invalid pagination parameters"}), 400
 
         # TODO: Implement proper pagination with SQLAlchemy
-        # For now, get all users and slice them
-        stmt = "SELECT * FROM users"  # Placeholder
-        # users = await service.get_all_users()
+        # For now, return an empty list (full implementation in Phase 8)
 
         # Temporary: Return empty list (full implementation in Phase 8)
         response = UserListResponse(
@@ -202,7 +200,7 @@ async def toggle_admin(user_id: int):
 
         return jsonify(response.model_dump(mode="json")), 200
 
-    except NotFoundError as e:
+    except NotFoundError:
         return jsonify({"error": "User not found"}), 404
     except Exception as e:
         current_app.logger.error(f"Error toggling admin status: {str(e)}")
@@ -265,7 +263,7 @@ async def toggle_block(user_id: int):
 
         return jsonify(response.model_dump(mode="json")), 200
 
-    except NotFoundError as e:
+    except NotFoundError:
         return jsonify({"error": "User not found"}), 404
     except Exception as e:
         current_app.logger.error(f"Error toggling block status: {str(e)}")
@@ -302,7 +300,7 @@ async def delete_user(user_id: int):
 
         return jsonify({}), 204
 
-    except NotFoundError as e:
+    except NotFoundError:
         return jsonify({"error": "User not found"}), 404
     except Exception as e:
         current_app.logger.error(f"Error deleting user: {str(e)}")

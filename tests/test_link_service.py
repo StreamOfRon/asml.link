@@ -1,13 +1,11 @@
 """Unit tests for link service."""
 
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.link import Link
 from app.models.user import User
-from app.utils.slug_generator import generate_random_slug
-from app.utils.validators import is_valid_url
 
 
 class TestLinkModel:

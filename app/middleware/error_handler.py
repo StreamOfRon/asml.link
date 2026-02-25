@@ -1,18 +1,16 @@
 """Global error handling middleware for centralized exception processing."""
 
-import json
-from typing import Optional
-from quart import Request, Response, jsonify, render_template
+from quart import jsonify, render_template
 from werkzeug.exceptions import HTTPException
 
 from app.exceptions import (
     AppException,
-    ValidationError,
-    NotFoundError,
-    UnauthorizedError,
-    ForbiddenError,
     ConflictError,
+    ForbiddenError,
+    NotFoundError,
     RateLimitError,
+    UnauthorizedError,
+    ValidationError,
 )
 
 

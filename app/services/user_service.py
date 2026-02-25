@@ -3,16 +3,16 @@
 from typing import Optional
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.exceptions import (
+    ConflictError,
+    NotFoundError,
+    ValidationError,
+)
 from app.models.user import User
 from app.utils.validators import is_valid_email, is_valid_full_name, normalize_email
-from app.exceptions import (
-    ValidationError,
-    NotFoundError,
-    ConflictError,
-)
 
 
 class UserService:
@@ -287,7 +287,7 @@ class UserService:
         Returns:
             List of admin User objects
         """
-        stmt = select(User).where(User.is_admin == True)
+        stmt = select(User).where(User.is_admin.is_(True))
         result = await self.db.execute(stmt)
         return result.scalars().all()
 
@@ -298,7 +298,7 @@ class UserService:
         Returns:
             List of blocked User objects
         """
-        stmt = select(User).where(User.is_blocked == True)
+        stmt = select(User).where(User.is_blocked.is_(True))
         result = await self.db.execute(stmt)
         return result.scalars().all()
 

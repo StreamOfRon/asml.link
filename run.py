@@ -8,6 +8,7 @@ use an ASGI server like Hypercorn or Uvicorn:
 """
 
 import asyncio
+
 from dotenv import load_dotenv
 
 from app import create_app

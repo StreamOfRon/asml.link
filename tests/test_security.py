@@ -1,10 +1,7 @@
 """Security tests for Phase 11 hardening features."""
 
-import pytest
-from datetime import datetime, timedelta
-
-from app.middleware.csrf import CSRFProtection
 from app.config import settings as app_settings
+from app.middleware.csrf import CSRFProtection
 
 
 class TestCSRFTokenGeneration:
@@ -111,7 +108,7 @@ class TestMiddlewareImports:
 
     def test_request_logging_middleware_imports(self):
         """Test request logging middleware can be imported."""
-        from app.middleware.request_logging import setup_request_logging, get_request_id
+        from app.middleware.request_logging import get_request_id, setup_request_logging
 
         assert setup_request_logging is not None
         assert get_request_id is not None

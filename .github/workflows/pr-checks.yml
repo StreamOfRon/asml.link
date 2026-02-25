@@ -27,7 +27,7 @@ jobs:
       - name: Run tests
         run: uv run pytest -q
 
-      - name: Run lint (ruff + mypy)
+      - name: Run lint (ruff)
         run: bash scripts/lint.sh
 
       - name: Check formatting (black)

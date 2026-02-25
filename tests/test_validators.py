@@ -1,11 +1,10 @@
 """Unit tests for input validation utilities."""
 
-import pytest
 from app.utils.validators import (
-    is_valid_url,
     is_valid_email,
-    normalize_email,
     is_valid_full_name,
+    is_valid_url,
+    normalize_email,
 )
 
 

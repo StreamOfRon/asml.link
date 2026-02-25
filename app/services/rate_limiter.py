@@ -1,8 +1,9 @@
 """Rate limiting service for API endpoints."""
 
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from typing import Optional
-from sqlalchemy import select, delete
+
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.rate_limit_entry import RateLimitEntry

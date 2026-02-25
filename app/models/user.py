@@ -1,10 +1,17 @@
 """User model."""
 
-from typing import List
-from sqlalchemy import String, Boolean
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List
+
+from sqlalchemy import Boolean, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models import BaseModel
+
+if TYPE_CHECKING:
+    from app.models.link import Link
+    from app.models.oauth_account import OAuthAccount
 
 
 class User(BaseModel):

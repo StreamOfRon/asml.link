@@ -4,13 +4,12 @@ This module provides routes for rendering Jinja2 templates and handling
 page navigation for the link shortener web interface.
 """
 
-from quart import Blueprint, render_template, request, redirect, session, g
-from sqlalchemy.ext.asyncio import AsyncSession
+from quart import Blueprint, redirect, render_template, request, session
 
 from app.models import get_db
 from app.services.link_service import LinkService
-from app.services.user_service import UserService
 from app.services.stats_service import StatsService
+from app.services.user_service import UserService
 
 web_bp = Blueprint("web", __name__)
 
@@ -75,7 +74,6 @@ async def dashboard():
     # Get user's links and stats
     db = await get_db()
     link_service = LinkService(db)
-    stats_service = StatsService(db)
 
     links = await link_service.get_user_links(current_user.id)
     total_links = len(links)
@@ -181,8 +179,9 @@ async def admin_allowlist():
     db = await get_db()
 
     # TODO: Implement allow-list service or directly query from db
-    from app.models import AllowlistEntry
     from sqlalchemy import select
+
+    from app.models import AllowlistEntry
 
     result = await db.execute(select(AllowlistEntry).order_by(AllowlistEntry.created_at.desc()))
     allow_list = result.scalars().all()

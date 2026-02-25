@@ -1,14 +1,11 @@
 """Tests for analytics and rate limiting features."""
 
-import pytest
-from datetime import datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.services.stats_service import StatsService
-from app.services.rate_limiter import RateLimiter
 from app.models.link import Link
 from app.models.user import User
-from app.models.rate_limit_entry import RateLimitEntry
+from app.services.rate_limiter import RateLimiter
+from app.services.stats_service import StatsService
 
 
 class TestStatsServicePerLink:
@@ -20,7 +17,7 @@ class TestStatsServicePerLink:
 
         # Increment hit count
         updated_link = await service.get_link_stats(test_link.slug)
-        initial_hits = updated_link.get("hit_count", 0)
+        _initial_hits = updated_link.get("hit_count", 0)
 
         # Link should have trackable stats
         assert updated_link["slug"] == test_link.slug

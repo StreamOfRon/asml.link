@@ -1,25 +1,21 @@
 """Link API route handlers."""
 
-from typing import Optional
+from quart import Blueprint, current_app, jsonify, request
 
-from quart import Blueprint, jsonify, request, current_app
-
-from app.dependencies import get_link_service
-from app.schemas.link import (
-    LinkCreateRequest,
-    LinkUpdateRequest,
-    LinkResponse,
-    LinkListResponse,
-)
 from app.exceptions import (
     AppException,
-    ValidationError,
-    NotFoundError,
     ForbiddenError,
-    UnauthorizedError,
+    NotFoundError,
+    ValidationError,
+)
+from app.models import get_db
+from app.schemas.link import (
+    LinkCreateRequest,
+    LinkListResponse,
+    LinkResponse,
+    LinkUpdateRequest,
 )
 from app.services.link_service import LinkService
-from app.models import get_db
 
 # Create blueprint
 links_bp = Blueprint("links", __name__, url_prefix="/api/links")

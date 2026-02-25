@@ -1,11 +1,12 @@
 """Unit tests for slug generation utilities."""
 
 import pytest
+
 from app.utils.slug_generator import (
-    generate_random_slug,
-    validate_slug,
-    is_valid_slug_length,
     BASE62_CHARS,
+    generate_random_slug,
+    is_valid_slug_length,
+    validate_slug,
 )
 
 
