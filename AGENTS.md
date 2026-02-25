@@ -1,209 +1,248 @@
-# OpenCode Agents Guide
+# Agent Guidelines for Link Shortening Service
 
-This document describes how to use OpenCode agents effectively for this Link Shortening Service project.
+Quick reference for agentic coding in this repository.
 
-## Available Agents
+## Build & Test Commands
 
-### 1. Explore Agent
-**Use case**: Quickly understand codebase structure, find files, search for patterns
+### Running Tests
+```bash
+# All tests
+uv run pytest
 
-**When to use**:
-- Identify where specific functionality is implemented
-- Find all files related to a feature (e.g., "Where is OAuth handled?")
-- Search for code patterns across the project
-- Understand component relationships
-- Answer "how does X work?" questions
+# Single test function
+uv run pytest tests/test_file.py::TestClass::test_function
 
-**Example prompts**:
-```
-Find all files that handle database queries and identify N+1 query problems
-Locate all middleware files and explain their responsibilities
-Search for all rate limiting implementation and how it's used
-```
+# Single test file
+uv run pytest tests/test_file.py
 
-**Thoroughness levels**:
-- `quick`: Basic file finding and simple pattern searches
-- `medium`: Search across multiple locations, understand relationships
-- `very_thorough`: Comprehensive analysis including test coverage, edge cases, integration points
+# With verbose output
+uv run pytest -vv
 
----
+# Stop on first failure
+uv run pytest -x
 
-### 2. General Agent
-**Use case**: Execute complex multi-step tasks, run tests, make changes, verify results
+# Specific test by name pattern
+uv run pytest -k "test_create_link"
 
-**When to use**:
-- Implement new features or bug fixes
-- Run test suites and fix failures
-- Refactor code sections
-- Performance optimization work
-- Complex debugging scenarios
-- Multi-file changes
-
-**Example prompts**:
-```
-Add caching to the LinkService to reduce database queries. Verify with tests.
-Implement database connection pooling optimization and measure performance improvements
-Fix all pytest failures in the test suite
+# With coverage report
+uv run pytest --cov=app --cov-report=term-missing
 ```
 
----
+### Code Quality
+```bash
+# Format code (Black + Ruff)
+uv run format
 
-## Common Tasks & Recommended Agents
+# Lint code
+uv run lint
 
-| Task | Agent | Notes |
-|------|-------|-------|
-| Find where something is implemented | Explore | Use `quick` for simple files, `very_thorough` for complex features |
-| Understand how a component works | Explore | Use `medium` or `very_thorough` |
-| Add a new feature | General | Combines research + implementation + testing |
-| Fix a bug | General | Search first with Explore, then fix with General |
-| Performance optimization | General | Analyze with Explore first, optimize with General |
-| Run and fix tests | General | Can handle entire test suite execution and fixes |
-| Refactor code | General | Complex multi-step changes across files |
-| Security audit | Explore | Find security-related code, then General for fixes |
+# Type checking
+uv run mypy app/
 
----
+# All checks
+uv run lint && uv run format && uv run mypy app/
 
-## Project Structure Reference
-
-Understanding the project layout helps you ask better agent questions:
-
+# Pre-commit hooks (runs on all files)
+pre-commit run --all-files
 ```
-app/
-├── models/          # SQLAlchemy ORM models (User, Link, OAuthAccount, etc.)
-├── services/        # Business logic layer (LinkService, UserService, etc.)
-├── routes/          # API endpoints and web UI routes
-├── middleware/      # Request/response middleware (CSRF, Security, Error Handling)
-├── schemas/         # Pydantic request/response validation
-├── utils/           # Helper functions (validators, slug generator, OAuth)
-├── templates/       # Jinja2 HTML templates
-└── static/          # CSS, JavaScript, static assets
 
-tests/               # 344+ tests covering all functionality
-migrations/          # Alembic database migrations
+### Development
+```bash
+# Run local dev server
+uv run dev
+
+# Run with Docker
+docker-compose --build up
 ```
 
 ---
 
-## Example Workflows
+## Code Style Guidelines
 
-### Workflow 1: Add a Performance Optimization Feature
+### Imports
+- Group imports: stdlib → third-party → local
+- Sort alphabetically within groups
+- One import per line for clarity
+- Use absolute imports (not relative)
 
-1. **Use Explore Agent** (`very_thorough`)
-   ```
-   Analyze the LinkService for N+1 query problems and identify caching opportunities
-   ```
+```python
+import asyncio
+from typing import Optional
 
-2. **Review results** and understand the optimization needs
+import aiohttp
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-3. **Use General Agent**
-   ```
-   Implement Redis caching for frequently accessed links. Update LinkService.get_link()
-   to check cache first. Add cache invalidation on link updates. Ensure all tests pass.
-   ```
-
-4. **Verify** by running tests and checking performance metrics
-
----
-
-### Workflow 2: Understand a Complex System
-
-1. **Use Explore Agent** (`medium`)
-   ```
-   How does the OAuth authentication flow work? Find all OAuth-related files and explain the flow.
-   ```
-
-2. **Review output** to understand the flow
-
-3. **Use General Agent** if changes needed
-   ```
-   Add support for a new OAuth provider (Microsoft). Follow the existing Google/GitHub pattern.
-   ```
-
----
-
-### Workflow 3: Fix Performance Issues
-
-1. **Use Explore Agent** (`very_thorough`)
-   ```
-   Identify slow database queries in the admin dashboard endpoints. Find all SELECT queries
-   that might have N+1 problems. Check for missing indexes.
-   ```
-
-2. **Review recommendations**
-
-3. **Use General Agent**
-   ```
-   Optimize the identified slow queries by adding proper joins and indexes.
-   Measure performance improvements and verify tests still pass.
-   ```
-
----
-
-## Performance Optimization Opportunities
-
-The project has identified the following optimization categories:
-
-- **Database Queries**: N+1 queries, missing indexes, inefficient joins
-- **Caching**: Frequently accessed data (links, user info), expensive computations
-- **Rate Limiter**: Current database lookups on every request
-- **Session Management**: Connection pooling efficiency
-- **API Responses**: Minimize data fetching and serialization
-- **Static Assets**: Compression and caching headers
-
-**Use this agent command to analyze all opportunities:**
-
-```
-Use the Explore agent (very_thorough) to identify all performance optimization
-opportunities in the codebase, with specific files, line numbers, and severity levels.
+from app.models.link import Link
+from app.services.link_service import LinkService
 ```
 
+### Formatting
+- **Line length**: 100 characters (Black/Ruff enforced)
+- **Indentation**: 4 spaces
+- **Type hints**: Required for all functions
+- **Docstrings**: Google-style for all public functions
+
+```python
+async def create_link(
+    db_session: AsyncSession,
+    user_id: int,
+    original_url: str,
+    is_public: bool = True,
+) -> Link:
+    """Create a shortened link.
+    
+    Args:
+        db_session: Database session
+        user_id: User creating the link
+        original_url: URL to shorten
+        is_public: Whether link is public
+        
+    Returns:
+        Created Link object
+        
+    Raises:
+        ValidationError: If validation fails
+        ConflictError: If slug already exists
+    """
+```
+
+### Type Hints
+- Use `Optional[T]` for nullable types (not `T | None`)
+- Import types from `typing` module
+- Annotate async functions with proper return types
+
+```python
+from typing import Optional, List
+
+async def get_user(user_id: int) -> Optional[User]:
+    """..."""
+```
+
+### Naming Conventions
+- **Functions**: `lowercase_with_underscores`
+- **Classes**: `PascalCase`
+- **Constants**: `UPPER_CASE`
+- **Private**: Leading underscore `_private_method`
+- **Async functions**: Same as sync, prefix `async def`
+- **Database models**: Singular noun `User` not `Users`
+
+### Error Handling
+- Raise custom exceptions, don't use `Exception`
+- Available exceptions in `app/exceptions.py`:
+  - `ValidationError` - Invalid input
+  - `ConflictError` - Resource conflict (duplicate slug)
+  - `NotFoundError` - Resource not found
+  - `ForbiddenError` - Access denied
+  - `UnauthorizedError` - Authentication required
+
+```python
+if not url_is_valid(url):
+    raise ValidationError(f"Invalid URL: {url}")
+
+if duplicate_slug:
+    raise ConflictError(f"Slug '{slug}' already exists")
+
+if not resource:
+    raise NotFoundError(f"Link {link_id} not found")
+
+if user_id != link.user_id:
+    raise ForbiddenError("You don't own this link")
+```
+
+### Async/Await
+- All database operations are async
+- Use `await` for async calls, never block
+- Use `async def` for route handlers and service methods
+- Test with `pytest-asyncio` (auto-enabled)
+
+```python
+async def get_link(db_session: AsyncSession, link_id: int) -> Link:
+    stmt = select(Link).where(Link.id == link_id)
+    result = await db_session.execute(stmt)
+    link = result.scalar_one_or_none()
+    if not link:
+        raise NotFoundError(...)
+    return link
+```
+
 ---
 
-## Tips for Effective Agent Usage
+## Project Structure
 
-### ✅ DO:
-- Be specific about what you want to understand or change
-- Include file paths or feature names in your query
-- Ask agents to verify their work with tests
-- Use `very_thorough` when exploring complex interconnected code
-- Ask agents to explain what they found before making changes
+**Core files**:
+- `app/models/` - SQLAlchemy ORM models
+- `app/services/` - Business logic (LinkService, UserService, etc.)
+- `app/routes/` - API endpoints and web routes
+- `app/middleware/` - CSRF, security headers, error handling
+- `app/exceptions.py` - Custom exception classes
+- `tests/` - 344+ tests (see conftest.py for fixtures)
 
-### ❌ DON'T:
-- Use agents for trivial single-file changes (just edit directly)
-- Ask vague questions without context
-- Assume agents will find every edge case without explicit instructions
-- Use General agent for pure research (use Explore instead)
-- Forget to run tests after making changes
+**Important**: Services handle business logic, routes are thin wrappers. Database operations go in services.
 
 ---
 
-## Security & Compliance Features to Maintain
+## Testing Patterns
 
-When using agents for changes, ensure these remain intact:
+Use pytest fixtures from `conftest.py`:
+- `db_session` - Fresh async database per test
+- `test_user` - Pre-created user
+- `test_link` - Pre-created link
 
-- **CSRF Protection** (middleware/csrf.py)
-- **Security Headers** (middleware/security_headers.py)
-- **Rate Limiting** (services/rate_limiter.py)
-- **Input Validation** (utils/validators.py)
-- **JWT Token Handling** (services/auth_service.py)
-- **OAuth Provider Safety** (utils/oauth.py)
-- **Database Query Safety** (services/models)
-
-Ask agents to verify these features are maintained after optimization changes.
-
----
-
-## Resources
-
-- **README.md** - Project overview and quick start
-- **CONFIGURATION.md** - Environment variables and setup
-- **DEPLOYMENT.md** - Production deployment guide
-- **CONTRIBUTING.md** - Development workflow and testing
-- **Test Suite** - 344+ tests in `tests/` directory (run with `pytest`)
-- **Git History** - Check commits for implementation details
+```python
+async def test_user_can_create_link(
+    db_session: AsyncSession,
+    test_user: User,
+):
+    """Test link creation."""
+    service = LinkService(db_session)
+    link = await service.create_link(
+        user_id=test_user.id,
+        original_url="https://example.com",
+    )
+    assert link.user_id == test_user.id
+```
 
 ---
 
-## Questions?
+## Pre-commit Hooks
 
-For OpenCode documentation: https://opencode.ai/docs
+Automatically runs on commit. Tools:
+- **Ruff** - Linting (E, F, W, I codes)
+- **Black** - Formatting
+- **MyPy** - Type checking
+- **Trailing whitespace/EOF fixer**
+
+To bypass (not recommended):
+```bash
+git commit --no-verify
+```
+
+---
+
+## Security Features (Maintain)
+
+When making changes, preserve:
+- **CSRF tokens** (middleware/csrf.py) - all forms use tokens
+- **Security headers** (middleware/security_headers.py)
+- **Input validation** (utils/validators.py) - validate URLs, emails, slugs
+- **Error handling** (middleware/error_handler.py) - catch and log all errors
+- **Rate limiting** (services/rate_limiter.py) - for sensitive endpoints
+
+---
+
+## Performance Considerations
+
+- Avoid N+1 queries - use eager loading/joins
+- Cache frequently accessed data
+- Use indexes for common filters
+- Test performance with benchmarks if adding heavy operations
+
+---
+
+## Documentation
+
+- Update README.md if adding user-facing features
+- Update CONFIGURATION.md for new env vars
+- Update CONTRIBUTING.md if workflow changes
+- Add docstrings to all public functions
