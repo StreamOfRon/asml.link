@@ -9,6 +9,11 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
+    model_config = ConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+    )
+
     # Database
     database_url: str = Field(default="sqlite:///./shortlink.db")
 
@@ -43,12 +48,6 @@ class Settings(BaseSettings):
 
     # Logging
     log_level: str = Field(default="INFO")
-
-    class Config:
-        """Pydantic configuration."""
-
-        env_file = ".env"
-        case_sensitive = False
 
     def get_oauth_providers(self) -> list[str]:
         """Parse comma-separated OAuth providers."""
