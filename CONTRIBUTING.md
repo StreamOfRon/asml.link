@@ -129,16 +129,16 @@ async def create_link(
     is_public: bool = True,
 ) -> Link:
     """Create a new shortened link.
-    
+
     Args:
         user_id: ID of the user creating the link
         original_url: Original URL to shorten
         slug: Custom slug (optional, generates if not provided)
         is_public: Whether link is publicly accessible
-        
+
     Returns:
         Created Link object
-        
+
     Raises:
         ValidationError: If validation fails
     """
@@ -166,14 +166,14 @@ async def create_link(
 async def test_user_can_create_link(self, db_session: AsyncSession, test_user: User):
     """Test user can create a new link."""
     service = LinkService(db_session)
-    
+
     link = await service.create_link(
         user_id=test_user.id,
         original_url="https://example.com",
         slug="test",
         is_public=True,
     )
-    
+
     assert link.slug == "test"
     assert link.user_id == test_user.id
     assert link.is_public is True
@@ -331,7 +331,7 @@ async def test_validate_url_accepts_valid_urls(self):
         "http://example.com/path?query=1",
         "https://sub.example.com:8080",
     ]
-    
+
     for url in valid_urls:
         assert is_valid_url(url) is True
 ```
@@ -347,11 +347,11 @@ async def test_user_creates_link_and_redirects(
     """Test complete workflow: create link → retrieve → redirect."""
     # Create link
     link = await service.create_link(...)
-    
+
     # Retrieve link
     retrieved = await service.get_link_by_slug(link.slug)
     assert retrieved is not None
-    
+
     # Track hit
     updated = await service.increment_hit_count(link.slug)
     assert updated.hit_count == 1
@@ -363,7 +363,7 @@ Use existing fixtures from `conftest.py`:
 
 ```python
 async def test_something(
-    self, 
+    self,
     db_session: AsyncSession,      # Database session
     test_user: User,               # Regular user
     test_admin_user: User,         # Admin user

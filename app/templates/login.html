@@ -12,7 +12,7 @@
                 <h1 class="text-2xl font-bold text-gray-900">Welcome Back</h1>
                 <p class="text-gray-600 mt-2">Sign in to manage your shortened links</p>
             </div>
-            
+
             <!-- OAuth Provider Buttons -->
             <div class="space-y-3">
                 {% if oauth_providers %}
@@ -28,21 +28,21 @@
                         <i class="fab fa-google text-lg"></i>
                         <span>Sign in with Google</span>
                     </a>
-                    
+
                     <a href="/auth/login/github" class="w-full py-2 px-4 rounded-lg font-medium transition-all flex items-center justify-center space-x-2 bg-gray-900 text-white hover:bg-gray-800">
                         <i class="fab fa-github text-lg"></i>
                         <span>Sign in with GitHub</span>
                     </a>
                 {% endif %}
             </div>
-            
+
             <!-- Divider -->
             <div class="my-6 flex items-center">
                 <div class="flex-1 border-t border-gray-300"></div>
                 <span class="px-2 text-gray-500 text-sm">or</span>
                 <div class="flex-1 border-t border-gray-300"></div>
             </div>
-            
+
             <!-- Demo Login Info -->
             <div class="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
                 <p class="text-sm text-gray-700">
@@ -52,7 +52,7 @@
                 </p>
             </div>
         </div>
-        
+
         <!-- Footer Link -->
         <div class="text-center mt-6">
             <p class="text-gray-600 text-sm">
