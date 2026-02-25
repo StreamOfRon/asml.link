@@ -3,7 +3,7 @@ name = "asml-link"
 version = "0.1.0"
 description = "Python link shortening service with OAuth2 authentication"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 authors = [{name = "Your Name", email = "email@example.com"}]
 license = {text = "MIT"}
 dependencies = [
@@ -39,15 +39,15 @@ packages = ["app"]
 
 [tool.black]
 line-length = 100
-target-version = ["py310"]
+target-version = ["py311"]
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py311"
 select = ["E", "F", "W", "I"]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
