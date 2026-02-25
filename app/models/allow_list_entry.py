@@ -15,6 +15,3 @@ class AllowListEntry(BaseModel):
 
     def __repr__(self) -> str:
         return f"<AllowListEntry(email={self.email!r})>"
-
-    def __repr__(self) -> str:
-        return f"<AllowListEntry(email={self.email!r})>"

@@ -45,9 +45,11 @@ async def create_app() -> Quart:
         return jsonify({"error": "Internal server error"}), 500
 
     # Register blueprints
-    from app.routes import links_bp, redirect_bp
+    from app.routes import links_bp, redirect_bp, users_bp, allowlist_bp
 
     app.register_blueprint(links_bp)
+    app.register_blueprint(users_bp)
+    app.register_blueprint(allowlist_bp)
     # Register redirect blueprint last so it doesn't interfere with other routes
     app.register_blueprint(redirect_bp)
 
