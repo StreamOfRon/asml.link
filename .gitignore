@@ -43,8 +43,8 @@ env/
 .env.*.local
 
 # Database
-shortlink.db
-shortlink.db-journal
+asml-link.db
+asml-link.db-journal
 *.sqlite
 *.sqlite3
 

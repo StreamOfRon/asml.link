@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     )
 
     # Database
-    database_url: str = Field(default="sqlite:///./shortlink.db")
+    database_url: str = Field(default="sqlite:///./asml-link.db")
 
     # OAuth Providers
     oauth_providers: str = Field(default="google,github")

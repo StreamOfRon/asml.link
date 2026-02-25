@@ -93,7 +93,7 @@ See `CONFIGURATION.md` for detailed configuration options.
 **Essential Variables:**
 ```bash
 # Database
-DATABASE_URL=sqlite:///./shortlink.db
+DATABASE_URL=sqlite:///./asml-link.db
 
 # OAuth Providers (Google)
 GOOGLE_CLIENT_ID=your_client_id
@@ -228,6 +228,17 @@ uv run lint
 
 # Type checking
 uv run mypy app/
+```
+
+### CI / GitHub Actions
+
+- PR checks run via `.github/workflows/pr-checks.yml` and use the `astral-sh/setup-uv@v1` action to install `uv` and the requested Python version. The action also provides caching for `uv` artifacts so CI runs faster.
+- Dependabot config is in `.github/dependabot.yml` and will open weekly updates for Python, GitHub Actions, and Docker.
+- To reproduce the CI steps locally: run
+```bash
+uv sync
+uv run pytest
+uv run lint
 ```
 
 ### Database Migrations

@@ -167,7 +167,7 @@ class TestRedirectEndpoint:
         """Test that original URL with query parameters is preserved."""
         service = LinkService(db_session)
 
-        url_with_params = "https://example.com/search?q=test&page=1&utm_source=shortlink"
+        url_with_params = "https://example.com/search?q=test&page=1&utm_source=asml"
         link = await service.create_link(
             user_id=test_user.id,
             original_url=url_with_params,

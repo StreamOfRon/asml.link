@@ -1,5 +1,5 @@
 [project]
-name = "shortlink-app"
+name = "asml-link"
 version = "0.1.0"
 description = "Python link shortening service with OAuth2 authentication"
 readme = "README.md"
