@@ -5,7 +5,6 @@ setting up middleware, error handlers, and route blueprints.
 """
 
 from quart import Quart, jsonify
-from quart.exceptions import HTTPException
 
 from app.config import settings
 from app.models import init_db, close_db
@@ -35,12 +34,12 @@ async def create_app() -> Quart:
 
     # Error handlers
     @app.errorhandler(404)
-    async def handle_404(error: HTTPException) -> tuple[dict, int]:
+    async def handle_404(error) -> tuple[dict, int]:
         """Handle 404 Not Found errors."""
         return jsonify({"error": "Not found", "message": str(error)}), 404
 
     @app.errorhandler(500)
-    async def handle_500(error: HTTPException) -> tuple[dict, int]:
+    async def handle_500(error) -> tuple[dict, int]:
         """Handle 500 Internal Server Error."""
         app.logger.error(f"Internal server error: {error}")
         return jsonify({"error": "Internal server error"}), 500
