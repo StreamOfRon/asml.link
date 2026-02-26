@@ -33,6 +33,9 @@ jobs:
       - name: Set short SHA
         run: echo "SHORT_SHA=${GITHUB_SHA::6}" >> $GITHUB_ENV
 
+      - name: Set lowercase repo owner
+        run: echo "REPO_OWNER_LOWER=$(echo \"${{ github.repository_owner }}\" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
@@ -40,4 +43,4 @@ jobs:
           file: ./Dockerfile
           push: true
           target: production
-          tags: ghcr.io/${{ toLower(github.repository_owner) }}/asml.link:${{ env.SHORT_SHA }},ghcr.io/${{ toLower(github.repository_owner) }}/asml.link:latest
+          tags: ghcr.io/${{ env.REPO_OWNER_LOWER }}/asml.link:${{ env.SHORT_SHA }},ghcr.io/${{ env.REPO_OWNER_LOWER }}/asml.link:latest
