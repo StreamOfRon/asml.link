@@ -40,13 +40,13 @@ A modern Python-based link shortening service built with **Quart** (async web fr
 | **Validation** | Pydantic |
 | **Testing** | Pytest (344+ tests) |
 | **Package Manager** | UV |
-| **Python Version** | 3.10+ (tested on 3.13.9) |
+| **Python Version** | 3.11+ required |
 | **Containerization** | Docker & Docker Compose |
 
 ## Quick Start
 
 ### Prerequisites
-- Python 3.10 or higher
+- Python 3.11 or higher
 - UV package manager
 - Git
 
@@ -198,16 +198,10 @@ http://localhost:5000/redoc
 
 ```bash
 # Run all tests
-uv run pytest
+./scripts/test.sh
 
-# Run specific test file
-uv run pytest tests/test_link_service.py
-
-# Run with coverage report
-uv run pytest --cov=app --cov-report=html
-
-# Run integration tests only
-uv run pytest tests/test_integration_workflows.py -v
+# Run lint checks
+./scripts/lint.sh
 ```
 
 **Test Coverage:**
@@ -220,14 +214,11 @@ uv run pytest tests/test_integration_workflows.py -v
 ### Code Quality
 
 ```bash
-# Format code
-uv run format
+# Run lint checks
+./scripts/lint.sh
 
-# Check code quality
-uv run lint
-
-# Type checking
-uv run mypy app/
+# Run tests
+./scripts/test.sh
 ```
 
 ### CI / GitHub Actions
@@ -427,5 +418,5 @@ Built with ❤️ using Quart, SQLAlchemy, and OAuth2.
 ---
 
 **Last Updated**: February 24, 2026
-**Python Version**: 3.13.9
+**Python Version**: 3.11+ required
 **Total Test Coverage**: 344 tests, all passing

@@ -401,3 +401,5 @@ DATABASE_URL=postgresql+asyncpg://user:password@db-server:5432/asml_link
 ---
 
 **Last Updated**: February 24, 2026
+
+**Python version required: 3.11+**
