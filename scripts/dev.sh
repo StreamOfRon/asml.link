@@ -9,4 +9,6 @@ if [ -f .env ]; then
 fi
 
 # Run Quart development server
-gunicorn -k asgi app.main:app --reload --bind "${HOST:-0.0.0.0}:${PORT:-5000}" --log-level debug
+uv run gunicorn --version
+uv run which gunicorn
+uv run gunicorn -k asgi app.main:app --reload --bind "${HOST:-0.0.0.0}:${PORT:-5000}" --log-level debug
