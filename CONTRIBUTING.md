@@ -53,7 +53,7 @@ cp .env.example .env
 pre-commit install
 
 # Verify setup
-uv run pytest
+./scripts/test.sh
 ```
 
 ### 3. Create Feature Branch
@@ -80,38 +80,20 @@ docker-compose --build up
 
 ```bash
 # All tests
-uv run pytest
+./scripts/test.sh
 
-# Specific test file
-uv run pytest tests/test_link_service.py
-
-# With coverage report
-uv run pytest --cov=app --cov-report=html
-
-# Integration tests only
-uv run pytest tests/test_integration_workflows.py -v
-
-# Verbose output
-uv run pytest -vv
-
-# Stop on first failure
-uv run pytest -x
+# Run lint checks
+./scripts/lint.sh
 ```
 
 ### Code Quality
 
 ```bash
-# Format code
-uv run format
+# Run lint checks
+./scripts/lint.sh
 
-# Run linting
-uv run lint
-
-# Type checking
-uv run mypy app/
-
-# All checks
-uv run lint && uv run format && uv run mypy app/
+# Run tests
+./scripts/test.sh
 ```
 
 ### Pre-commit Hooks
@@ -119,9 +101,7 @@ uv run lint && uv run format && uv run mypy app/
 Hooks run automatically on commit:
 
 ```bash
-# Ruff linting and formatting
-# Black code formatting
-# MyPy type checking
+# Ruff linting
 # Trailing whitespace/EOF fixer
 ```
 
@@ -331,9 +311,9 @@ git push origin feature/add-qr-codes
 
 - [ ] Tests pass: `uv run pytest`
 - [ ] Coverage maintained or improved
-- [ ] Code formatted: `uv run format`
-- [ ] Linting passes: `uv run lint`
-- [ ] Type checking passes: `uv run mypy app/`
+- [ ] Linting passes: `./scripts/lint.sh`
+- [ ] Tests pass: `./scripts/test.sh`
+- [ ] Type hints are present in new/changed code
 - [ ] Documentation updated
 - [ ] No breaking changes to API
 - [ ] Commit messages follow conventions

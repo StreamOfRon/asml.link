@@ -11,16 +11,20 @@ A short description of what this PR does and why.
 
 ## How to test
 1. Run `uv sync`
-2. Run tests: `uv run pytest`
-3. Run linters: `uv run lint`
+2. Run tests: `./scripts/test.sh`
+3. Run linters: `./scripts/lint.sh`
 4. (Optional) Build image: `docker build --target production -t local-asml:prod .`
 
 ## Checklist
-- [ ] I have run `uv run format` and committed formatting changes
-- [ ] I have run `uv run lint` and addressed all findings
-- [ ] I have run tests locally (`uv run pytest`) and they pass
+- [ ] I have run `./scripts/lint.sh` and addressed all findings
+- [ ] I have run `./scripts/test.sh` and tests pass
+- [ ] Type hints are present in new or changed code
 - [ ] I added/updated tests for any new behavior
 - [ ] I updated relevant documentation (README, AGENTS.md, CONFIGURATION.md)
 
 ## Notes
 Add any additional notes for reviewers, edge-cases, or deployment considerations.
+
+---
+
+**Python version required: 3.11+**

@@ -11,7 +11,7 @@ Complete guide for deploying the Link Shortening Service to production.
 
 ### 2. Traditional Server
 - VPS or dedicated server
-- Requires Python 3.10+, PostgreSQL, Nginx/Apache
+- Requires Python 3.11+, PostgreSQL, Nginx/Apache
 - More hands-on management
 
 ### 3. Platform-as-a-Service
@@ -23,7 +23,7 @@ Complete guide for deploying the Link Shortening Service to production.
 
 ### All Deployments
 - PostgreSQL 12+ database
-- Python 3.10+ or Docker
+- Python 3.11+ or Docker
 - Domain name with DNS configured
 - SSL/TLS certificate (Let's Encrypt recommended)
 

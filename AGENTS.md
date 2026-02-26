@@ -6,41 +6,20 @@ Quick reference for agentic coding in this repository.
 
 ### Running Tests
 ```bash
-# All tests
-uv run pytest
+# Run all tests
+./scripts/test.sh
 
-# Single test function
-uv run pytest tests/test_file.py::TestClass::test_function
-
-# Single test file
-uv run pytest tests/test_file.py
-
-# With verbose output
-uv run pytest -vv
-
-# Stop on first failure
-uv run pytest -x
-
-# Specific test by name pattern
-uv run pytest -k "test_create_link"
-
-# With coverage report
-uv run pytest --cov=app --cov-report=term-missing
+# Run lint checks
+./scripts/lint.sh
 ```
 
 ### Code Quality
 ```bash
-# Format code (Black + Ruff)
-uv run format
+# Run lint checks
+./scripts/lint.sh
 
-# Lint code
-uv run lint
-
-# Type checking
-uv run mypy app/
-
-# All checks
-uv run lint && uv run format && uv run mypy app/
+# Run tests
+./scripts/test.sh
 
 # Pre-commit hooks (runs on all files)
 pre-commit run --all-files
@@ -84,9 +63,9 @@ from app.services.link_service import LinkService
 ```
 
 ### Formatting
-- **Line length**: 100 characters (Black/Ruff enforced)
+- **Line length**: 100 characters (Ruff enforced)
 - **Indentation**: 4 spaces
-- **Type hints**: Required for all functions
+- **Type hints**: Recommended for all functions
 - **Docstrings**: Google-style for all public functions
 
 ```python
@@ -215,8 +194,6 @@ async def test_user_can_create_link(
 
 Automatically runs on commit. Tools:
 - **Ruff** - Linting (E, F, W, I codes)
-- **Black** - Formatting
-- **MyPy** - Type checking
 - **Trailing whitespace/EOF fixer**
 
 To bypass (not recommended):
