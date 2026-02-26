@@ -76,10 +76,10 @@ The project is now always run using Gunicorn with its native ASGI worker:
 
 ```bash
 # Local development (with live reload)
-gunicorn -k asgi app.main:app --reload --bind 0.0.0.0:5000
+uv run gunicorn -k asgi app.main:app --reload --bind 0.0.0.0:5000
 
 # Production/example Docker usage:
-gunicorn -k asgi app.main:app --workers 4 --log-level info --bind 0.0.0.0:5000
+uv run gunicorn -k asgi app.main:app --workers 4 --log-level info --bind 0.0.0.0:5000
 
 # To use a Gunicorn config file (advanced):
 # Append: -c /path/to/gunicorn_conf.py
@@ -242,20 +242,7 @@ uv run pytest
 uv run pytest --cov=app --cov-report=term-missing
 ```
 
-### 4. Code Review
-
-```bash
-# Format code
-uv run format
-
-# Run linting
-uv run lint
-
-# Type checking
-uv run mypy app/
-```
-
-### 5. Commit Changes
+### 4. Commit Changes
 
 ```bash
 # Add files
@@ -301,7 +288,7 @@ docs: Update README with deployment guide
 refactor(services): Extract common validation logic
 ```
 
-### 6. Push and Create Pull Request
+### 5. Push and Create Pull Request
 
 ```bash
 # Push to your fork

@@ -23,7 +23,7 @@ RUN uv sync
 EXPOSE 5000
 
 # Development command (hot-reload via code volume mount)
-CMD ["gunicorn", "-k", "asgi", "app.main:app", "--reload", "--bind", "0.0.0.0:5000", "--log-level", "debug"]
+CMD ["uv", "run","gunicorn", "-k", "asgi", "app.main:app", "--reload", "--bind", "0.0.0.0:5000", "--log-level", "debug"]
 
 # Production stage
 FROM python:3.13-slim AS production
@@ -46,4 +46,4 @@ RUN uv sync --no-dev
 EXPOSE 5000
 
 # Production command
-CMD ["gunicorn", "-k", "asgi", "app.main:app", "--bind", "0.0.0.0:5000", "--workers", "4", "--log-level", "info"]
+CMD ["uv", "run", "gunicorn", "-k", "asgi", "app.main:app", "--bind", "0.0.0.0:5000", "--workers", "4", "--log-level", "info"]

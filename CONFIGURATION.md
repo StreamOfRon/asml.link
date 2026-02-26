@@ -120,12 +120,12 @@ PORT=5000
 WORKERS=4  # Number of workers for Gunicorn
 
 # Example server command for development:
-# gunicorn -k asgi app.main:app --reload --bind 0.0.0.0:5000
+# uv run gunicorn -k asgi app.main:app --reload --bind 0.0.0.0:5000
 # For production:
-# gunicorn -k asgi app.main:app --workers 4 --log-level info --bind 0.0.0.0:5000
+# uv run gunicorn -k asgi app.main:app --workers 4 --log-level info --bind 0.0.0.0:5000
 
 # You may override Gunicorn config with a Python config file by adding the -c argument:
-# gunicorn -k asgi app.main:app -c /path/to/gunicorn_conf.py [other args...]
+# uv run gunicorn -k asgi app.main:app -c /path/to/gunicorn_conf.py [other args...]
 # See: https://gunicorn.org/reference/settings/
 ```
 

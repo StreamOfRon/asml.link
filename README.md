@@ -51,7 +51,7 @@ A modern Python-based link shortening service built with **Quart** (async web fr
 For advanced options, you can pass a Python config file (see Gunicorn documentation for details):
 
 ```bash
-gunicorn -k asgi app.main:app -c path/to/gunicorn_conf.py
+uv run gunicorn -k asgi app.main:app -c path/to/gunicorn_conf.py
 ```
 
 Example settings you can override: `workers`, `bind`, `loglevel`, `timeout`, etc.
@@ -89,18 +89,18 @@ The recommended way to serve the application in both development and production 
 
 **Development (auto-reload, debug logging):**
 ```bash
-gunicorn -k asgi app.main:app --reload --log-level debug --bind 0.0.0.0:5000
+uv run gunicorn -k asgi app.main:app --reload --log-level debug --bind 0.0.0.0:5000
 ```
 
 **Production (example, 4 workers, info logging):**
 ```bash
-gunicorn -k asgi app.main:app --workers 4 --log-level info --bind 0.0.0.0:5000
+uv run gunicorn -k asgi app.main:app --workers 4 --log-level info --bind 0.0.0.0:5000
 ```
 
 You can override settings and supply advanced configuration with a Gunicorn Python config file:
 
 ```bash
-gunicorn -k asgi app.main:app -c path/to/gunicorn_conf.py
+uv run gunicorn -k asgi app.main:app -c path/to/gunicorn_conf.py
 ```
 
 See the [Gunicorn Settings Reference](https://gunicorn.org/reference/settings/) for all available options and config file format.
