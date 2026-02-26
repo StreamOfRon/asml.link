@@ -13,6 +13,9 @@ repos:
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
-      - id: check-yaml
+      - id: no-commit-to-branch
+        args: ['--branch', 'main']
+        message: "Direct commits to 'main' are blocked. Please use a feature branch and submit a pull request."
+
       - id: check-added-large-files
   # mypy hook removed — MyPy is no longer part of the project's CI/dev checks
