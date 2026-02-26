@@ -36,6 +36,15 @@ jobs:
       - name: Set lowercase repo owner
         run: echo "REPO_OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ env.REPO_OWNER_LOWER }}/asml.link
+          tags: |
+            type=sha,prefix=ghcr.io/${{ env.REPO_OWNER_LOWER }}/asml.link
+            type=raw,value=ghcr.io/${{ env.REPO_OWNER_LOWER }}/asml.link:latest,enable={{is_default_branch}}
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -43,4 +52,4 @@ jobs:
           file: ./Dockerfile
           push: true
           target: production
-          tags: ghcr.io/${{ env.REPO_OWNER_LOWER }}/asml.link:${{ env.SHORT_SHA }},ghcr.io/${{ env.REPO_OWNER_LOWER }}/asml.link:latest
+          tags: ${{ steps.meta.outputs.tags }}
