@@ -42,8 +42,8 @@ jobs:
         with:
           images: ghcr.io/${{ env.REPO_OWNER_LOWER }}/asml.link
           tags: |
-            type=sha,prefix=ghcr.io/${{ env.REPO_OWNER_LOWER }}/asml.link
-            type=raw,value=ghcr.io/${{ env.REPO_OWNER_LOWER }}/asml.link:latest,enable={{is_default_branch}}
+            type=sha
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push
         uses: docker/build-push-action@v6
