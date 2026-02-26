@@ -1,8 +1,29 @@
 # Contributing Guide
 
-Thank you for contributing to the Link Shortening Service! This guide will help you set up the development environment and contribute effectively.
+## Branch Protection Policy
 
-## Code of Conduct
+Direct commits or pushes to the `main` branch are prohibited.
+
+All changes must be submitted via a feature branch and opened as a pull request. GitHub branch protection rules require PRs and passing status checks for merging.
+
+To help prevent mistakes, our repository's pre-commit hook will block commits made directly to `main`. If you attempt to commit in `main`, you'll see an error message:
+
+> Direct commits to 'main' are blocked. Please use a feature branch and submit a pull request.
+
+**How to make changes:**
+1. Create a new branch for your feature or fix:
+   `git checkout -b feature/my-update`
+2. Commit your changes there
+3. Push the branch and open a pull request
+
+**How to install pre-commit hooks:**
+After cloning, run:
+```
+pre-commit install
+```
+This will activate the branch-checking hook for your local development.
+
+
 
 - Be respectful and inclusive
 - Ask for help when needed
