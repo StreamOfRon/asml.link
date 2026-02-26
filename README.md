@@ -1,6 +1,6 @@
 # Link Shortening Service
 
-A modern Python-based link shortening service built with **Quart** (async web framework), featuring OAuth2 authentication, flexible access control, rate limiting, and comprehensive admin capabilities.
+A modern Python-based link shortening service built with **Quart** (async web framework), served with Gunicorn + Gunicorn native ASGI worker, featuring OAuth2 authentication, flexible access control, rate limiting, and comprehensive admin capabilities.
 
 **Status**: Phase 12 Complete (344 passing tests) | Production Ready
 
@@ -41,9 +41,23 @@ A modern Python-based link shortening service built with **Quart** (async web fr
 | **Testing** | Pytest (344+ tests) |
 | **Package Manager** | UV |
 | **Python Version** | 3.11+ required |
-| **Containerization** | Docker & Docker Compose |
+| **Containerization** | Docker & Docker Compose (Gunicorn (native ASGI worker)) |
 
 ## Quick Start
+
+---
+### Gunicorn Advanced Configuration
+
+For advanced options, you can pass a Python config file (see Gunicorn documentation for details):
+
+```bash
+gunicorn -k asgi app.main:app -c path/to/gunicorn_conf.py
+```
+
+Example settings you can override: `workers`, `bind`, `loglevel`, `timeout`, etc.
+More info: [Gunicorn Settings Reference](https://gunicorn.org/reference/settings/)
+
+---
 
 ### Prerequisites
 - Python 3.11 or higher
@@ -70,9 +84,26 @@ cp .env.example .env
 ```
 
 4. **Run development server**
+
+The recommended way to serve the application in both development and production is with Gunicorn's built-in native ASGI worker.
+
+**Development (auto-reload, debug logging):**
 ```bash
-uv run dev
+gunicorn -k asgi app.main:app --reload --log-level debug --bind 0.0.0.0:5000
 ```
+
+**Production (example, 4 workers, info logging):**
+```bash
+gunicorn -k asgi app.main:app --workers 4 --log-level info --bind 0.0.0.0:5000
+```
+
+You can override settings and supply advanced configuration with a Gunicorn Python config file:
+
+```bash
+gunicorn -k asgi app.main:app -c path/to/gunicorn_conf.py
+```
+
+See the [Gunicorn Settings Reference](https://gunicorn.org/reference/settings/) for all available options and config file format.
 
 The application will start at `http://localhost:5000`
 
@@ -81,6 +112,8 @@ The application will start at `http://localhost:5000`
 ```bash
 docker-compose --build up
 ```
+
+The development Docker container uses Gunicorn with the native ASGI worker and automatic code reload enabled.
 
 Application automatically reloads on code changes. SQLite database is persisted locally.
 
@@ -299,8 +332,9 @@ link-shortening-service/
 
 ### Production Deployment
 
-See `DEPLOYMENT.md` for complete production deployment guide including:
-- Docker production image
+See `DEPLOYMENT.md` for the complete production deployment guide including:
+- Docker production image using Gunicorn with its native ASGI worker
+- How to pass a custom Gunicorn Python config file in your deployment (`-c path/to/gunicorn_conf.py`)
 - PostgreSQL database setup
 - Environment configuration for production
 - Nginx reverse proxy configuration

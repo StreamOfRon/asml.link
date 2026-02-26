@@ -38,6 +38,8 @@ Configure these before deployment:
 
 ## Docker Deployment
 
+> **Server Info:** All production and development starts now use Gunicorn with its native ASGI worker (`gunicorn -k asgi app.main:app`), superseding prior servers or commands. You may pass a Python config file (`-c /path/to/gunicorn_conf.py`) for advanced options—see [Gunicorn's official Settings Reference](https://gunicorn.org/reference/settings/).
+
 ### Production Dockerfile
 
 The project includes a multi-stage `Dockerfile`:
@@ -50,7 +52,8 @@ RUN apt-get update && apt-get install -y git
 RUN pip install uv
 COPY . .
 RUN uv sync
-CMD ["uv", "run", "dev"]
+CMD ["gunicorn", "-k", "asgi", "app.main:app", "--bind", "0.0.0.0:5000", "--reload"]
+# Use -c <path> to pass custom config file, see https://gunicorn.org/reference/settings/
 
 # Production stage
 FROM python:3.13-slim as production
@@ -59,9 +62,18 @@ RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/ap
 RUN pip install uv
 COPY . .
 RUN uv sync --production
-RUN uv pip install gunicorn hypercorn
+RUN uv pip install gunicorn
 EXPOSE 5000
-CMD ["hypercorn", "run:app", "--bind", "0.0.0.0:5000", "--workers", "4"]
+# Gunicorn+Uvicorn is now the universal app server for production and local development
+# To override with a config file, add the "-c"/"--config" argument (see example below)
+CMD ["gunicorn", "-k", "asgi", "app.main:app", "--bind", "0.0.0.0:5000", "--workers", "4", "--log-level", "info"]
+# Example with config file (see https://gunicorn.org/reference/settings/):
+# CMD ["gunicorn", "-k", "asgi", "app.main:app", "--bind", "0.0.0.0:5000", "--workers", "4", "--log-level", "info", "-c", "/app/gunicorn_conf.py"]
+# To use a Gunicorn config file (advanced):
+# Add: "-c", "/path/to/gunicorn_conf.py"
+# Learn more: https://gunicorn.org/reference/settings/
+# Example:
+# CMD ["gunicorn", "-k", "asgi", "app.main:app", "--bind", "0.0.0.0:5000", "--workers", "4", "--log-level", "info", "-c", "/app/gunicorn_conf.py"]
 ```
 
 ### Build and Push Production Image
@@ -504,8 +516,11 @@ sudo certbot renew --force-renewal
 # Check processes
 docker-compose -f docker-compose.prod.yml top app
 
-# Reduce workers in hypercorn command
-CMD ["hypercorn", "run:app", "--bind", "0.0.0.0:5000", "--workers", "2"]
+# Adjust worker count in Gunicorn command
+CMD ["gunicorn", "-k", "asgi", "app.main:app", "--bind", "0.0.0.0:5000", "--workers", "2", "--log-level", "info"]
+# To use a Gunicorn config file (advanced):
+# Add: "-c", "/path/to/gunicorn_conf.py"
+# Docs: https://gunicorn.org/reference/settings/
 ```
 
 ### Issue: OAuth Redirect URI Mismatch
