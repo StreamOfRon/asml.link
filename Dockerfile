@@ -17,7 +17,7 @@ COPY run.py .
 COPY .env.example .env
 
 # Install dependencies
-RUN uv sync
+RUN uv sync --all-extras
 
 # Expose port
 EXPOSE 5000
@@ -40,7 +40,7 @@ COPY migrations ./migrations
 COPY run.py .
 
 # Install production dependencies only (no dev dependencies)
-RUN uv sync --no-dev
+RUN uv sync --all-extras --no-dev
 
 # Expose port
 EXPOSE 5000

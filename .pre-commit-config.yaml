@@ -6,7 +6,6 @@ repos:
         args: [--fix]
       - id: ruff-format
 
-  # Black formatter removed from pre-commit hooks.
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -15,7 +14,5 @@ repos:
       - id: end-of-file-fixer
       - id: no-commit-to-branch
         args: ['--branch', 'main']
-        message: "Direct commits to 'main' are blocked. Please use a feature branch and submit a pull request."
 
       - id: check-added-large-files
-  # mypy hook removed — MyPy is no longer part of the project's CI/dev checks

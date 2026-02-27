@@ -1,5 +1,6 @@
 """Database models base configuration."""
 
+import os
 from datetime import datetime
 from typing import AsyncGenerator
 
@@ -14,6 +15,13 @@ from app.config import settings
 def _create_engine() -> AsyncEngine:
     """Create async engine with proper connection pooling configuration."""
     db_url = settings.get_database_url()
+
+    if db_url.startswith("sqlite"):
+        db_path = db_url.replace("sqlite+aiosqlite:///", "").replace("sqlite:///", "")
+        if db_path:
+            db_dir = os.path.dirname(db_path)
+            if db_dir and not os.path.exists(db_dir):
+                os.makedirs(db_dir, exist_ok=True)
 
     # SQLite doesn't support connection pooling, use StaticPool instead
     if db_url.startswith("sqlite"):
