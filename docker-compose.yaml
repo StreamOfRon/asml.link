@@ -13,11 +13,10 @@ services:
       - ./tests:/app/tests
       - ./scripts:/app/scripts
       - ./run.py:/app/run.py
-      - ./asml-link.db:/app/asml-link.db
+      - ./data:/app/data
     env_file:
       - .env
     environment:
       - DEBUG=true
-      - DATABASE_URL=sqlite+aiosqlite:///./asml-link.db
     command: uv run gunicorn app.main:app -k asgi --bind 0.0.0.0:5000 --reload
     restart: unless-stopped

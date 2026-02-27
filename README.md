@@ -126,7 +126,7 @@ See `CONFIGURATION.md` for detailed configuration options.
 **Essential Variables:**
 ```bash
 # Database
-DATABASE_URL=sqlite:///./asml-link.db
+DATABASE_URL=sqlite:///./data/asml-link.db
 
 # OAuth Providers (Google)
 GOOGLE_CLIENT_ID=your_client_id
