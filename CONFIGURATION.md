@@ -10,7 +10,7 @@ Complete guide to configuring the Link Shortening Service for development and pr
 
 ```bash
 # SQLite (Development)
-DATABASE_URL=sqlite:///./asml-link.db
+DATABASE_URL=sqlite:///./data/asml-link.db
 
 # PostgreSQL (Production)
 DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/asml_link_db
@@ -136,7 +136,7 @@ WORKERS=4  # Number of workers for Gunicorn
 **.env**
 ```bash
 # Database
-DATABASE_URL=sqlite:///./asml-link.db
+DATABASE_URL=sqlite:///./data/asml-link.db
 
 # OAuth (local)
 GOOGLE_CLIENT_ID=your-dev-client-id
@@ -329,7 +329,7 @@ For advanced settings (timeouts, logging, etc.), use the `-c /path/to/gunicorn_c
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_URL` | `sqlite:///./asml-link.db` | Database connection string |
+| `DATABASE_URL` | `sqlite:///./data/asml-link.db` | Database connection string |
 | `GOOGLE_CLIENT_ID` | None | Google OAuth Client ID |
 | `GOOGLE_CLIENT_SECRET` | None | Google OAuth Client Secret |
 | `GOOGLE_REDIRECT_URI` | None | Google OAuth redirect URI |

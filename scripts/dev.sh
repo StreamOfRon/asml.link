@@ -3,6 +3,9 @@
 
 set -e
 
+# Change to project root (where .env and database file live)
+cd "$(dirname "$0")/.."
+
 # Load environment variables
 if [ -f .env ]; then
     export $(cat .env | grep -v '#' | xargs)
