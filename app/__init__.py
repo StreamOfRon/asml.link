@@ -5,6 +5,7 @@ setting up middleware, error handlers, and route blueprints.
 """
 
 from quart import Quart, jsonify
+from tenacity import retry, wait_exponential
 
 from app.config import settings
 from app.middleware import (
@@ -13,6 +14,12 @@ from app.middleware import (
     setup_security_headers_middleware,
 )
 from app.models import close_db, init_db
+
+
+@retry(wait=wait_exponential(min=1, max=60), reraise=True)
+async def init_db_with_retry() -> None:
+    """Initialize database with exponential backoff retry."""
+    await init_db()
 
 
 async def create_app() -> Quart:
@@ -33,8 +40,8 @@ async def create_app() -> Quart:
     # Startup and shutdown handlers
     @app.before_serving
     async def startup() -> None:
-        """Initialize database on startup."""
-        await init_db()
+        """Initialize database on startup with exponential backoff retry."""
+        await init_db_with_retry()
 
     @app.after_serving
     async def shutdown() -> None:

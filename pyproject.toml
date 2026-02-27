@@ -18,6 +18,7 @@ dependencies = [
     "aiohttp>=3.9.0",
     "aiosqlite>=0.19.0",
     "gunicorn>=25.1.0",
+    "tenacity>=8.0",
 ]
 
 [project.optional-dependencies]
@@ -27,6 +28,12 @@ dev = [
     "pytest-cov>=4.1.0",
     "ruff>=0.10.0",
     "pre-commit>=3.4.0",
+]
+postgresql = [
+    "asyncpg>=0.29.0",
+]
+mysql = [
+    "aiomysql>=0.2.0",
 ]
 
 [build-system]

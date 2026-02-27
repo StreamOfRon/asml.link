@@ -43,8 +43,8 @@ env/
 .env.*.local
 
 # Database
-data/asml-link.db
-data/asml-link.db-journal
+*.db
+*.db-journal
 *.sqlite
 *.sqlite3
 

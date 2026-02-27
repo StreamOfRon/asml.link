@@ -7,6 +7,7 @@ initialization, migration, and cleanup operations.
 from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from tenacity import retry, wait_exponential
 
 from app.models import Base, async_engine, async_session, close_db, init_db
 
@@ -53,6 +54,12 @@ async def verify_database_connection() -> bool:
     except Exception as e:
         print(f"✗ Database connection failed: {e}")
         return False
+
+
+@retry(wait=wait_exponential(min=1, max=60), reraise=True)
+async def verify_database_connection_with_retry() -> bool:
+    """Verify database connection with exponential backoff retry."""
+    return await verify_database_connection()
 
 
 async def cleanup_database() -> None:
