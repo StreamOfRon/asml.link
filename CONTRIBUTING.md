@@ -1,5 +1,9 @@
 # Contributing Guide
 
+_Last updated: February 25, 2026_
+
+**ASGI Server Notice:** This application always uses Gunicorn (`gunicorn -k asgi app.main:app`) for all environments. Pass `-c /path/to/gunicorn_conf.py` for a Python config file if needed (see: https://gunicorn.org/reference/settings/).
+
 ## Branch Protection Policy
 
 Direct commits or pushes to the `main` branch are prohibited.
@@ -31,6 +35,8 @@ This will activate the branch-checking hook for your local development.
 - Focus on the code, not the person
 
 ## Getting Started
+
+> **Note:** Local development, Docker, and production all use Gunicorn with its native ASGI worker as the application server. See "Running the Application" below for usage and config options.
 
 ### 1. Fork and Clone
 
@@ -66,11 +72,20 @@ git checkout -b feature/your-feature-name
 
 ### Running the Application
 
-```bash
-# Local development
-uv run dev
+The project is now always run using Gunicorn with its native ASGI worker:
 
-# With Docker
+```bash
+# Local development (with live reload)
+uv run gunicorn -k asgi app.main:app --reload --bind 0.0.0.0:5000
+
+# Production/example Docker usage:
+uv run gunicorn -k asgi app.main:app --workers 4 --log-level info --bind 0.0.0.0:5000
+
+# To use a Gunicorn config file (advanced):
+# Append: -c /path/to/gunicorn_conf.py
+# See: https://gunicorn.org/reference/settings/
+
+# With Docker:
 docker-compose --build up
 
 # Application available at http://localhost:5000
@@ -227,20 +242,7 @@ uv run pytest
 uv run pytest --cov=app --cov-report=term-missing
 ```
 
-### 4. Code Review
-
-```bash
-# Format code
-uv run format
-
-# Run linting
-uv run lint
-
-# Type checking
-uv run mypy app/
-```
-
-### 5. Commit Changes
+### 4. Commit Changes
 
 ```bash
 # Add files
@@ -286,7 +288,7 @@ docs: Update README with deployment guide
 refactor(services): Extract common validation logic
 ```
 
-### 6. Push and Create Pull Request
+### 5. Push and Create Pull Request
 
 ```bash
 # Push to your fork

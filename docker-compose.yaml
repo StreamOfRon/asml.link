@@ -19,5 +19,5 @@ services:
     environment:
       - DEBUG=true
       - DATABASE_URL=sqlite+aiosqlite:///./asml-link.db
-    command: hypercorn app.main:app --reload --host 0.0.0.0 --port 5000
+    command: uv run gunicorn app.main:app -k asgi --bind 0.0.0.0:5000 --reload
     restart: unless-stopped

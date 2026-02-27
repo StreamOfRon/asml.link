@@ -1,7 +1,7 @@
 # Multi-stage Dockerfile for development and production
 
 # Development stage
-FROM python:3.13-slim as development
+FROM python:3.13-slim AS development
 
 WORKDIR /app
 
@@ -23,10 +23,10 @@ RUN uv sync
 EXPOSE 5000
 
 # Development command (hot-reload via code volume mount)
-CMD ["uv", "run", "hypercorn", "app.main:app", "--reload", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["uv", "run","gunicorn", "-k", "asgi", "app.main:app", "--reload", "--bind", "0.0.0.0:5000", "--log-level", "debug"]
 
 # Production stage
-FROM python:3.13-slim as production
+FROM python:3.13-slim AS production
 
 WORKDIR /app
 
@@ -46,4 +46,4 @@ RUN uv sync --no-dev
 EXPOSE 5000
 
 # Production command
-CMD ["uv", "run", "hypercorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000"]
+CMD ["uv", "run", "gunicorn", "-k", "asgi", "app.main:app", "--bind", "0.0.0.0:5000", "--workers", "4", "--log-level", "info"]

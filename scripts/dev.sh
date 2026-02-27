@@ -9,4 +9,4 @@ if [ -f .env ]; then
 fi
 
 # Run Quart development server
-uv run hypercorn app.main:app --reload --host "${HOST:-0.0.0.0}" --port "${PORT:-5000}"
+uv run gunicorn -k asgi app.main:app --reload --bind "${HOST:-0.0.0.0}:${PORT:-5000}" --log-level debug

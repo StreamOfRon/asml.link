@@ -1,10 +1,11 @@
 """Application entry point and development server.
 
 This script starts the Quart development server. For production use,
-use an ASGI server like Hypercorn or Uvicorn:
+use Gunicorn’s native ASGI worker:
 
-    hypercorn run:app --bind 0.0.0.0:5000
-    uvicorn run:app --host 0.0.0.0 --port 5000
+    gunicorn -k asgi app.main:app --reload --bind 0.0.0.0:5000
+    # Gunicorn config file: see docs at
+    # https://docs.gunicorn.org/en/stable/settings.html#configuration-file
 """
 
 import asyncio

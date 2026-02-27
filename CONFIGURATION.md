@@ -1,5 +1,7 @@
 # Configuration Guide
 
+> **Server Information:** The Link Shortening Service now always runs using Gunicorn's native ASGI worker. You can adjust the number of workers, host, and port via environment variables or arguments; see below for production and development example commands.
+
 Complete guide to configuring the Link Shortening Service for development and production environments.
 
 ## Environment Variables
@@ -109,15 +111,22 @@ ENABLE_ALLOW_LIST_MODE=false         # If true, registration restricted to allow
 
 ### Server Configuration
 
+The application uses Gunicorn with its native ASGI worker for all environments (development, Docker, production).
+
 ```bash
-# Server Settings
+# Server Settings - set as environment variables (used by Gunicorn)
 HOST=0.0.0.0
 PORT=5000
-WORKERS=4                            # Number of worker processes
+WORKERS=4  # Number of workers for Gunicorn
 
-# In Docker, use:
-# HOST=0.0.0.0 (required for Docker)
-# PORT=5000
+# Example server command for development:
+# uv run gunicorn -k asgi app.main:app --reload --bind 0.0.0.0:5000
+# For production:
+# uv run gunicorn -k asgi app.main:app --workers 4 --log-level info --bind 0.0.0.0:5000
+
+# You may override Gunicorn config with a Python config file by adding the -c argument:
+# uv run gunicorn -k asgi app.main:app -c /path/to/gunicorn_conf.py [other args...]
+# See: https://gunicorn.org/reference/settings/
 ```
 
 ## Configuration by Environment
@@ -309,6 +318,12 @@ uv run pytest --cov=app --cov-report=html
 # Integration tests only
 uv run pytest tests/test_integration_workflows.py -v
 ```
+
+## Gunicorn Advanced Configuration
+
+You can configure Gunicorn via command-line arguments or by passing a Python config file.
+
+For advanced settings (timeouts, logging, etc.), use the `-c /path/to/gunicorn_conf.py` option. See the [Gunicorn Settings Reference](https://gunicorn.org/reference/settings/) for all available config options. This project does not ship a sample config file—refer to the official docs for templates.
 
 ## Environment Variable Reference
 
